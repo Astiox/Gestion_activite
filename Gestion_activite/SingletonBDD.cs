@@ -133,6 +133,31 @@ namespace Gestion_activite
                 return false;
             }
         }
+        public ObservableCollection<string> getDateSeance()
+        {
+            ObservableCollection<string> resultats = new ObservableCollection<string>();
+
+            try
+            {
+                MySqlCommand commande = new MySqlCommand("SELECT DISTINCT DateSeance FROM seances ",connection);
+                connection.Open();
+                MySqlDataReader r = commande.ExecuteReader();
+                while (r.Read())
+                {
+                    resultats.Add(r.GetString(0));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erreur : " + ex.Message);
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                    connection.Close();
+            }
+            return resultats;
+        }
 
         public void AjouterAdherent(string id, string nom, string prenom, DateTime dateNaissance, string adresse, string motDePasse, string email)
         {

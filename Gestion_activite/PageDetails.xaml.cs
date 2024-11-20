@@ -33,6 +33,7 @@ namespace Gestion_activite
         public PageDetails()
         {
             this.InitializeComponent();
+            DatesDisponiblesComboBox.ItemsSource = SingletonBDD.GetInstance().getDateSeance();
         }
         public class HoraireSelection
         {
@@ -46,7 +47,7 @@ namespace Gestion_activite
             SelectedActivite = e.Parameter as Activite;
             DataContext = this;
 
-            LoadDatesDisponibles();
+            //LoadDatesDisponibles();
         }
 
         private void RetourButton_Click(object sender, RoutedEventArgs e)
@@ -54,17 +55,17 @@ namespace Gestion_activite
             Frame.Navigate(typeof(PageAccueil));
         }
 
-        private void LoadDatesDisponibles()
-        {
-            var seances = SingletonBDD.GetInstance().GetSeances(SelectedActivite.ID, DateTime.Now);
-            var dates = seances.Select(s => s.Date.Date).Distinct();
+        //private void LoadDatesDisponibles()
+        //{
+        //    var seances = SingletonBDD.GetInstance().GetSeances(SelectedActivite.ID);
+        //    var dates = seances.Select(s => s.Date.Date).Distinct();
 
-            DatesDisponibles.Clear();
-            foreach (var date in dates)
-            {
-                DatesDisponibles.Add(date);
-            }
-        }
+        //    DatesDisponibles.Clear();
+        //    foreach (var date in dates)
+        //    {
+        //        DatesDisponibles.Add(date);
+        //    }
+        //}
 
         private void DatesDisponiblesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

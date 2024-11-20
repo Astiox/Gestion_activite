@@ -28,7 +28,7 @@
 
                 <Border Background="#FFFFFF" CornerRadius="15" Padding="20">
                     <StackPanel Spacing="10">
-                        <Image Source="{Binding SelectedActivite.Image}" Stretch="UniformToFill" Height="300" />
+                        <Image Source="{Binding SelectedActivite.Image}" Stretch="Uniform"  Height="300"  />
                         <TextBlock Text="{Binding SelectedActivite.Nom}"
                                    FontSize="32"
                                    FontWeight="Bold"
