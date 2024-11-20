@@ -1,0 +1,15 @@
+﻿<Application
+    x:Class="Gestion_activite.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Gestion_activite">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+            <x:Boolean x:Key="IsLoggedIn">False</x:Boolean>
+            <x:String x:Key="CurrentUser">None</x:String>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

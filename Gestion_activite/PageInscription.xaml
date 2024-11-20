@@ -1,0 +1,43 @@
+﻿<Page
+    x:Class="Gestion_activite.PageInscription"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Gestion_activite"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="#2e3a4f">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="4*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Inscription"
+                   FontSize="32"
+                   FontWeight="Bold"
+                   Foreground="White"
+                   HorizontalAlignment="Center"
+                   Margin="10"/>
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+            <TextBox PlaceholderText="Nom" Width="300" x:Name="NomInput"/>
+            <TextBox PlaceholderText="Prénom" Width="300" x:Name="PrenomInput"/>
+            <TextBox PlaceholderText="Email" Width="300" x:Name="EmailInput"/>
+            <PasswordBox PlaceholderText="Mot de passe" Width="300" x:Name="MotDePasseInput"/>
+            <TextBox PlaceholderText="Adresse" Width="300" x:Name="AdresseInput"/>
+            <DatePicker Header="Date de naissance" Width="300" x:Name="DateNaissanceInput" />
+            <Button Content="Valider l'inscription"
+                    Width="200"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    Click="ValiderButton_Click"/>
+            <Button Content="Retour"
+                    Width="200"
+                    Background="#2196F3"
+                    Foreground="White"
+                    Click="RetourButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>

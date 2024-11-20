@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Gestion_activite (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Gestion_activite (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
