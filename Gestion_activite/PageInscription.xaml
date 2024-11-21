@@ -15,11 +15,12 @@
         </Grid.RowDefinitions>
 
         <TextBlock Text="Inscription"
-                   FontSize="32"
+                   FontSize="50"
                    FontWeight="Bold"
                    Foreground="White"
                    HorizontalAlignment="Center"
-                   Margin="10"/>
+                   Margin="10"
+                   VerticalAlignment="Bottom"/>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
             <TextBox PlaceholderText="Nom" Width="300" x:Name="NomInput"/>
@@ -27,7 +28,8 @@
             <TextBox PlaceholderText="Email" Width="300" x:Name="EmailInput"/>
             <PasswordBox PlaceholderText="Mot de passe" Width="300" x:Name="MotDePasseInput"/>
             <TextBox PlaceholderText="Adresse" Width="300" x:Name="AdresseInput"/>
-            <DatePicker Header="Date de naissance" Width="300" x:Name="DateNaissanceInput" />
+            <TextBlock Foreground="White">Date de naissance:</TextBlock>
+            <DatePicker Width="300" x:Name="DateNaissanceInput"/>
             <Button Content="Valider l'inscription"
                     Width="200"
                     Background="#4CAF50"
