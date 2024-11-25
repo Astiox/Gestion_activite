@@ -7,7 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="#2e3a4f">
-
     <Grid Padding="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -28,7 +27,7 @@
 
                 <Border Background="#FFFFFF" CornerRadius="15" Padding="20">
                     <StackPanel Spacing="10">
-                        <Image Source="{Binding SelectedActivite.Image}" Stretch="Uniform"  Height="300"  />
+                        <Image Source="{Binding SelectedActivite.Image}" Stretch="Uniform" Height="300" />
                         <TextBlock Text="{Binding SelectedActivite.Nom}"
                                    FontSize="32"
                                    FontWeight="Bold"
@@ -47,12 +46,18 @@
                 <StackPanel>
                     <TextBlock Text="Sélectionnez une date disponible :" FontSize="18" Foreground="White" />
                     <ComboBox x:Name="DatesDisponiblesComboBox"
-                              SelectionChanged="DatesDisponiblesComboBox_SelectionChanged"
-                              ItemsSource="{Binding DatesDisponibles}"
-                              DisplayMemberPath="Date"
-                              PlaceholderText="Choisissez une date"
-                              Foreground="Black"
-                              Width="200" />
+          SelectionChanged="DatesDisponiblesComboBox_SelectionChanged"
+          ItemsSource="{Binding DatesDisponibles}"
+          PlaceholderText="Choisissez une date"
+          Foreground="Black"
+          Width="200">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
                 </StackPanel>
 
                 <StackPanel>
@@ -60,11 +65,16 @@
                     <ItemsControl x:Name="HorairesList">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <CheckBox Content="{Binding Horaire}"
-                                          IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Content="{Binding Horaire}"
+                          IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+
+
+
                 </StackPanel>
 
                 <Button Content="Confirmer la participation"
@@ -74,7 +84,6 @@
                         BorderBrush="Transparent"
                         CornerRadius="15"
                         Click="ConfirmerButton_Click"
-                        IsEnabled="{Binding IsAnyHoraireSelected}"
                         x:Name="ConfirmerButton" />
 
             </StackPanel>

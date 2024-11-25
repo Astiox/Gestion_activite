@@ -30,10 +30,13 @@ namespace Gestion_activite
 
         public MySqlConnection GetConnection()
         {
-            if (connection.State == ConnectionState.Closed)
+            if (connection.State == ConnectionState.Closed || connection.State == ConnectionState.Broken)
+            {
                 connection.Open();
+            }
             return connection;
         }
+
 
         public void ExecuteNonQuery(string query, Dictionary<string, object> parameters)
         {
@@ -70,30 +73,23 @@ namespace Gestion_activite
             if (connection.State == ConnectionState.Open)
                 connection.Close();
         }
+        public static void SetUtilisateurConnecte(Dictionary<string, object> utilisateur)
+        {
+            App.Current.Resources["UtilisateurConnecte"] = utilisateur;
+        }
+
+        public static Dictionary<string, object> GetUtilisateurConnecte()
+        {
+            if (App.Current.Resources.ContainsKey("UtilisateurConnecte"))
+            {
+                return App.Current.Resources["UtilisateurConnecte"] as Dictionary<string, object>;
+            }
+            return null;
+        }
 
         public Dictionary<string, object> AuthentifierUtilisateur(string email, string motDePasse)
         {
-            string query = "SELECT * FROM adherents WHERE Email = @Email AND MotDePasse = @MotDePasse";
-            using (var reader = ExecuteReader(query, new Dictionary<string, object>
-        {
-        { "@Email", email },
-        { "@MotDePasse", motDePasse }
-        }))
-            {
-                if (reader.Read())
-                {
-                    return new Dictionary<string, object>
-            {
-                { "ID", reader["ID"] },
-                { "Nom", reader["Nom"] },
-                { "Prenom", reader["Prenom"] },
-                { "Email", reader["Email"] },
-                { "Role", "Adherent" }
-            };
-                }
-            }
-
-            query = "SELECT * FROM admins WHERE Email = @Email AND MotDePasse = @MotDePasse";
+            string query = "SELECT ID, Nom, Prenom FROM adherents WHERE Email = @Email AND MotDePasse = @MotDePasse";
             using (var reader = ExecuteReader(query, new Dictionary<string, object>
     {
         { "@Email", email },
@@ -102,19 +98,26 @@ namespace Gestion_activite
             {
                 if (reader.Read())
                 {
+                    int id;
+                    if (!int.TryParse(reader["ID"].ToString(), out id))
+                    {
+                        throw new FormatException("La valeur de l'ID utilisateur n'est pas au bon format.");
+                    }
+
                     return new Dictionary<string, object>
             {
-                { "ID", reader["ID"] },
-                { "Nom", reader["Nom"] },
-                { "Prenom", reader["Prenom"] },
-                { "Email", reader["Email"] },
-                { "Role", "Admin" }
+                { "ID", id },
+                { "Nom", reader["Nom"].ToString() },
+                { "Prenom", reader["Prenom"].ToString() },
+                { "Email", email }
             };
                 }
             }
 
-            return null;
+            return null; 
         }
+
+
         public bool EmailExiste(string email)
         {
             try
@@ -133,18 +136,22 @@ namespace Gestion_activite
                 return false;
             }
         }
-        public ObservableCollection<string> getDateSeance()
+        public ObservableCollection<DateTime> getDateSeance()
         {
-            ObservableCollection<string> resultats = new ObservableCollection<string>();
+            ObservableCollection<DateTime> resultats = new ObservableCollection<DateTime>();
 
             try
             {
-                MySqlCommand commande = new MySqlCommand("SELECT DISTINCT DateSeance FROM seances ",connection);
-                connection.Open();
-                MySqlDataReader r = commande.ExecuteReader();
-                while (r.Read())
+                string query = "SELECT DISTINCT Date FROM seances";
+                using (var command = new MySqlCommand(query, GetConnection()))
                 {
-                    resultats.Add(r.GetString(0));
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            resultats.Add(reader.GetDateTime("Date")); 
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -153,11 +160,12 @@ namespace Gestion_activite
             }
             finally
             {
-                if (connection.State == ConnectionState.Open)
-                    connection.Close();
+                CloseConnection();
             }
+
             return resultats;
         }
+
 
         public void AjouterAdherent(string id, string nom, string prenom, DateTime dateNaissance, string adresse, string motDePasse, string email)
         {
@@ -342,11 +350,29 @@ namespace Gestion_activite
             }
             return liste;
         }
+        public List<DateTime> GetAvailableDates(int activiteID)
+        {
+            List<DateTime> dates = new List<DateTime>();
+            string query = "SELECT DISTINCT Date FROM seances WHERE ActiviteID = @activiteID";
+
+            using (var command = new MySqlCommand(query, GetConnection()))
+            {
+                command.Parameters.AddWithValue("@activiteID", activiteID);
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        dates.Add(reader.GetDateTime("Date"));
+                    }
+                }
+            }
+            return dates;
+        }
+
         public List<Seance> GetSeances(int activiteID, DateTime date)
         {
             List<Seance> seances = new List<Seance>();
-            string query = "SELECT ID, ActiviteID, DateSeance, Horaire, PlacesDisponibles, PlacesRestantes " +
-                           "FROM seances WHERE ActiviteID = @activiteID AND DateSeance = @date";
+            string query = "SELECT ID, ActiviteID, Date, Horaire, PlacesDisponibles, PlacesTotales FROM seances WHERE ActiviteID = @activiteID AND Date = @date";
 
             using (var command = new MySqlCommand(query, GetConnection()))
             {
@@ -357,16 +383,15 @@ namespace Gestion_activite
                 {
                     while (reader.Read())
                     {
-                        Seance seance = new Seance
+                        seances.Add(new Seance
                         {
                             ID = reader.GetInt32("ID"),
                             ActiviteID = reader.GetInt32("ActiviteID"),
-                            Date = reader.GetDateTime("DateSeance"),
-                            Horaire = reader.IsDBNull(reader.GetOrdinal("Horaire")) ? "Non spécifié" : reader.GetString("Horaire"),
-                            PlacesRestantes = reader.GetInt32("PlacesRestantes"),
-                            PlacesTotales = reader.GetInt32("PlacesDisponibles")
-                        };
-                        seances.Add(seance);
+                            Date = reader.GetDateTime("Date"),
+                            Horaire = reader.GetTimeSpan("Horaire"),
+                            PlacesRestantes = reader.GetInt32("PlacesDisponibles"),
+                            PlacesTotales = reader.GetInt32("PlacesTotales")
+                        });
                     }
                 }
             }
@@ -392,38 +417,80 @@ namespace Gestion_activite
 
 
         public void AjouterSeance(int activiteID, DateTime dateSeance, int placesDisponibles)
-        {
-            string query = "INSERT INTO seances (ActiviteID, DateSeance, PlacesDisponibles, PlacesRestantes) VALUES (@activiteID, @dateSeance, @placesDisponibles, @placesDisponibles)";
-            ExecuteNonQuery(query, new Dictionary<string, object>
+            {
+                string query = "INSERT INTO seances (ActiviteID, DateSeance, PlacesDisponibles, PlacesRestantes) VALUES (@activiteID, @dateSeance, @placesDisponibles, @placesDisponibles)";
+                ExecuteNonQuery(query, new Dictionary<string, object>
     {
         { "@activiteID", activiteID },
         { "@dateSeance", dateSeance },
         { "@placesDisponibles", placesDisponibles }
     });
-        }
+            }
 
 
-        public void SupprimerSeance(int id)
+            public void SupprimerSeance(int id)
+            {
+                string query = "DELETE FROM seances WHERE ID = @id";
+                ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+            }
+        public List<Participation> ObtenirParticipations(int adherentID)
         {
-            string query = "DELETE FROM seances WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+            string query = "SELECT ID, AdherentID, SeanceID, Note FROM participations WHERE AdherentID = @AdherentID";
+
+            List<Participation> participations = new List<Participation>();
+
+            using (var reader = ExecuteReader(query, new Dictionary<string, object> { { "@AdherentID", adherentID } }))
+            {
+                while (reader.Read())
+                {
+                    participations.Add(new Participation
+                    {
+                        ID = reader.GetInt32("ID"),
+                        AdherentID = reader.GetInt32("AdherentID"),
+                        SeanceID = reader.GetInt32("SeanceID"),
+                        Note = reader.IsDBNull(reader.GetOrdinal("Note")) ? null : reader.GetDecimal("Note")
+                    });
+                }
+            }
+            return participations;
+        }
+        private void ChargerParticipations()
+        {
+            if (SingletonBDD.UtilisateurConnecte != null)
+            {
+                int adherentID = (int)SingletonBDD.UtilisateurConnecte["ID"];
+                var participations = SingletonBDD.GetInstance().ObtenirParticipations(adherentID);
+
+                foreach (var participation in participations)
+                {
+                    Console.WriteLine($"Participation ID: {participation.ID}, Seance ID: {participation.SeanceID}, Note: {participation.Note}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Aucun utilisateur connecté.");
+            }
         }
 
         public void AjouterParticipation(int adherentID, int seanceID, decimal? note)
         {
-            string query = "INSERT INTO participations (AdherentID, SeanceID, Note) VALUES (@adherentID, @seanceID, @note)";
+            string query = "INSERT INTO participations (AdherentID, SeanceID, Note) VALUES (@AdherentID, @SeanceID, @Note)";
+
             ExecuteNonQuery(query, new Dictionary<string, object>
-            {
-                { "@adherentID", adherentID },
-                { "@seanceID", seanceID },
-                { "@note", note }
-            });
+    {
+        { "@AdherentID", adherentID },
+        { "@SeanceID", seanceID },
+        { "@Note", (object)note ?? DBNull.Value }
+    });
         }
 
+
+
+
         public void SupprimerParticipation(int id)
-        {
-            string query = "DELETE FROM participations WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+            {
+                string query = "DELETE FROM participations WHERE ID = @id";
+                ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+            }
         }
     }
-}
