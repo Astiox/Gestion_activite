@@ -8,9 +8,11 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -25,16 +27,15 @@ namespace Gestion_activite
     public sealed partial class PageDetails : Page
     {
         public Activite SelectedActivite { get; set; }
-        public ObservableCollection<DateTime> DatesDisponibles { get; set; } = new ObservableCollection<DateTime>();
+        public ObservableCollection<string> DatesDisponibles { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<HoraireSelection> HorairesDisponibles { get; set; } = new ObservableCollection<HoraireSelection>();
-
-        public bool IsAnyHoraireSelected => HorairesDisponibles.Any(h => h.IsSelected);
 
         public PageDetails()
         {
             this.InitializeComponent();
-            DatesDisponiblesComboBox.ItemsSource = SingletonBDD.GetInstance().getDateSeance();
+            DataContext = this;
         }
+
         public class HoraireSelection
         {
             public string Horaire { get; set; }
@@ -45,9 +46,24 @@ namespace Gestion_activite
         {
             base.OnNavigatedTo(e);
             SelectedActivite = e.Parameter as Activite;
-            DataContext = this;
 
-            //LoadDatesDisponibles();
+            if (SelectedActivite != null)
+            {
+                LoadDatesDisponibles();
+            }
+        }
+
+        private void LoadDatesDisponibles()
+        {
+            DatesDisponibles.Clear();
+            var dates = SingletonBDD.GetInstance().GetAvailableDates(SelectedActivite.ID);
+
+            foreach (var date in dates)
+            {
+                DatesDisponibles.Add(date.ToString("dd/MM/yyyy"));
+            }
+
+            DatesDisponiblesComboBox.ItemsSource = DatesDisponibles;
         }
 
         private void RetourButton_Click(object sender, RoutedEventArgs e)
@@ -55,21 +71,10 @@ namespace Gestion_activite
             Frame.Navigate(typeof(PageAccueil));
         }
 
-        //private void LoadDatesDisponibles()
-        //{
-        //    var seances = SingletonBDD.GetInstance().GetSeances(SelectedActivite.ID);
-        //    var dates = seances.Select(s => s.Date.Date).Distinct();
-
-        //    DatesDisponibles.Clear();
-        //    foreach (var date in dates)
-        //    {
-        //        DatesDisponibles.Add(date);
-        //    }
-        //}
-
         private void DatesDisponiblesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (DatesDisponiblesComboBox.SelectedItem is DateTime selectedDate)
+            if (DatesDisponiblesComboBox.SelectedItem is string selectedDateString &&
+                DateTime.TryParseExact(selectedDateString, "dd/MM/yyyy", null, DateTimeStyles.None, out DateTime selectedDate))
             {
                 LoadHorairesDisponibles(selectedDate);
             }
@@ -78,90 +83,163 @@ namespace Gestion_activite
         private void LoadHorairesDisponibles(DateTime date)
         {
             HorairesDisponibles.Clear();
-
             var seances = SingletonBDD.GetInstance().GetSeances(SelectedActivite.ID, date);
 
             foreach (var seance in seances)
             {
-                HorairesDisponibles.Add(new HoraireSelection
+                if (seance.PlacesRestantes > 0)
                 {
-                    Horaire = seance.Horaire,
-                    IsSelected = false
-                });
+                    HorairesDisponibles.Add(new HoraireSelection
+                    {
+                        Horaire = seance.Horaire.ToString(@"hh\:mm"),
+                        IsSelected = false
+                    });
+                }
             }
 
             HorairesList.ItemsSource = HorairesDisponibles;
-
-            ConfirmerButton.IsEnabled = IsAnyHoraireSelected;
         }
 
         private async void ConfirmerButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SingletonBDD.UtilisateurConnecte == null)
+            var utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
+            if (utilisateurConnecte == null)
             {
-                ContentDialog actionDialog = new ContentDialog
+                await DemanderConnexionOuInscriptionAsync();
+                utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
+                if (utilisateurConnecte == null)
                 {
-                    Title = "Connexion requise",
-                    Content = "Vous devez être connecté pour confirmer votre participation. Que souhaitez-vous faire ?",
-                    PrimaryButtonText = "Se connecter",
-                    SecondaryButtonText = "S'inscrire",
-                    CloseButtonText = "Annuler",
-                    XamlRoot = this.XamlRoot
-                };
-
-                actionDialog.PrimaryButtonClick += (dlgSender, dlgArgs) =>
-                {
-                };
-
-                actionDialog.SecondaryButtonClick += (dlgSender, dlgArgs) =>
-                {
-                    Frame.Navigate(typeof(PageInscription));
-                };
-
-                var actionResult = await actionDialog.ShowAsync();
-                if (SingletonBDD.UtilisateurConnecte == null)
-                {
-                    return;
+                    return; // L'utilisateur n'est toujours pas connecté
                 }
             }
 
             try
             {
-                var horairesConfirmee = HorairesDisponibles.Where(h => h.IsSelected).Select(h => h.Horaire).ToList();
-
-                foreach (var horaire in horairesConfirmee)
+                var horairesSelectionnes = HorairesDisponibles.FirstOrDefault(h => h.IsSelected);
+                if (horairesSelectionnes == null)
                 {
-                    var seance = SingletonBDD.GetInstance().GetSeances(SelectedActivite.ID, (DateTime)DatesDisponiblesComboBox.SelectedItem)
-                                              .FirstOrDefault(s => s.Horaire == horaire);
-
-                    if (seance != null)
+                    await new ContentDialog
                     {
-                        SingletonBDD.GetInstance().ReserverPlace(seance.ID);
-                    }
+                        Title = "Erreur",
+                        Content = "Veuillez sélectionner un horaire.",
+                        CloseButtonText = "OK",
+                        XamlRoot = this.XamlRoot
+                    }.ShowAsync();
+                    return;
                 }
 
-                ContentDialog successDialog = new ContentDialog
+                var seanceCorrespondante = SingletonBDD.GetInstance()
+                    .GetSeances(SelectedActivite.ID,
+                                DateTime.ParseExact((string)DatesDisponiblesComboBox.SelectedItem, "dd/MM/yyyy", null))
+                    .FirstOrDefault(s => s.Horaire.ToString(@"hh\:mm") == horairesSelectionnes.Horaire);
+
+                if (seanceCorrespondante != null)
+                {
+                    int adherentID = (int)utilisateurConnecte["ID"]; 
+                    SingletonBDD.GetInstance().ReserverPlace(seanceCorrespondante.ID);
+                    SingletonBDD.GetInstance().AjouterParticipation(adherentID, seanceCorrespondante.ID, null);
+
+                    HorairesDisponibles.Remove(horairesSelectionnes);
+                }
+
+                await new ContentDialog
                 {
                     Title = "Réservation confirmée",
-                    Content = "Votre participation a été confirmée pour les horaires sélectionnés.",
+                    Content = $"Votre participation pour l'horaire {horairesSelectionnes.Horaire} a été enregistrée.",
                     CloseButtonText = "OK",
                     XamlRoot = this.XamlRoot
-                };
-                await successDialog.ShowAsync();
+                }.ShowAsync();
 
-                LoadHorairesDisponibles((DateTime)DatesDisponiblesComboBox.SelectedItem);
+                LoadHorairesDisponibles(DateTime.ParseExact((string)DatesDisponiblesComboBox.SelectedItem, "dd/MM/yyyy", null));
             }
             catch (Exception ex)
             {
-                ContentDialog errorDialog = new ContentDialog
+                await new ContentDialog
                 {
                     Title = "Erreur",
                     Content = ex.Message,
                     CloseButtonText = "OK",
                     XamlRoot = this.XamlRoot
-                };
-                await errorDialog.ShowAsync();
+                }.ShowAsync();
             }
         }
+
+
+
+        private async Task DemanderConnexionOuInscriptionAsync()
+        {
+            var choixDialog = new ContentDialog
+            {
+                Title = "Connexion requise",
+                Content = "Vous devez être connecté pour confirmer votre participation. Que souhaitez-vous faire ?",
+                PrimaryButtonText = "Se connecter",
+                SecondaryButtonText = "S'inscrire",
+                CloseButtonText = "Annuler",
+                XamlRoot = this.XamlRoot
+            };
+
+            var result = await choixDialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                await DemanderConnexionAsync();
+            }
+            else if (result == ContentDialogResult.Secondary)
+            {
+                Frame.Navigate(typeof(PageInscription));
+            }
+        }
+
+        private async Task DemanderConnexionAsync()
+        {
+            var emailInput = new TextBox { PlaceholderText = "Email" };
+            var passwordInput = new PasswordBox { PlaceholderText = "Mot de passe" };
+            var errorMessage = new TextBlock
+            {
+                Foreground = new SolidColorBrush(Microsoft.UI.Colors.Red),
+                Visibility = Visibility.Collapsed,
+                Margin = new Thickness(0, 10, 0, 0)
+            };
+
+            var loginContent = new StackPanel
+            {
+                Children = { emailInput, passwordInput, errorMessage }
+            };
+
+            var loginDialog = new ContentDialog
+            {
+                Title = "Connexion",
+                Content = loginContent,
+                PrimaryButtonText = "Connexion",
+                CloseButtonText = "Annuler",
+                XamlRoot = this.XamlRoot
+            };
+
+            loginDialog.PrimaryButtonClick += (sender, args) =>
+            {
+                string email = emailInput.Text;
+                string password = passwordInput.Password;
+
+                if (!SingletonBDD.GetInstance().EmailExiste(email) || !SingletonBDD.GetInstance().VerifierConnexion(email, password))
+                {
+                    errorMessage.Text = "Adresse email ou mot de passe incorrect.";
+                    errorMessage.Visibility = Visibility.Visible;
+                    args.Cancel = true;
+                }
+                else
+                {
+                    var utilisateur = SingletonBDD.GetInstance().AuthentifierUtilisateur(email, password);
+                    SingletonBDD.SetUtilisateurConnecte(utilisateur); 
+                }
+            };
+
+            await loginDialog.ShowAsync();
+        }
+
     }
 }
+
+
+
+
+
