@@ -26,21 +26,21 @@
         <ScrollViewer Grid.Row="1">
             <StackPanel Spacing="20">
 
-                <Border Background="#FFFFFF" CornerRadius="15" Padding="20">
+                <Border Background="Wheat" CornerRadius="15" Padding="20">
                     <StackPanel Spacing="10">
-                        <Image Source="{Binding SelectedActivite.Image}" Stretch="Uniform"  Height="300"  />
+                        <Image Source="{Binding SelectedActivite.Image}" Stretch="Uniform"  Height="350"  />
                         <TextBlock Text="{Binding SelectedActivite.Nom}"
                                    FontSize="32"
                                    FontWeight="Bold"
-                                   Foreground="Black" />
+                                   Foreground="DimGray" />
                         <TextBlock Text="{Binding SelectedActivite.Description}"
                                    FontSize="18"
-                                   Foreground="Black"
+                                   Foreground="LightSlateGray"
                                    TextWrapping="Wrap" />
                         <TextBlock Text="{Binding SelectedActivite.PrixFormate}"
                                    FontSize="24"
                                    FontWeight="SemiBold"
-                                   Foreground="Black" />
+                                   Foreground="DarkSlateGray" />
                     </StackPanel>
                 </Border>
 
