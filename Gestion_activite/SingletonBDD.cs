@@ -79,8 +79,23 @@ namespace Gestion_activite
         }
         public static void SetUtilisateurConnecte(Dictionary<string, object> utilisateur)
         {
-            App.Current.Resources["UtilisateurConnecte"] = utilisateur;
+            if (utilisateur != null)
+            {
+                App.Current.Resources["UtilisateurConnecte"] = utilisateur;
+
+                Console.WriteLine($"Utilisateur connecté avec succès : {utilisateur["Nom"]} ({utilisateur["Role"]})");
+            }
+            else
+            {
+                if (App.Current.Resources.ContainsKey("UtilisateurConnecte"))
+                {
+                    App.Current.Resources.Remove("UtilisateurConnecte");
+                }
+
+                Console.WriteLine("Utilisateur déconnecté.");
+            }
         }
+
 
 
         public static Dictionary<string, object> GetUtilisateurConnecte()
@@ -93,10 +108,12 @@ namespace Gestion_activite
         }
 
 
+
         public Dictionary<string, object> AuthentifierUtilisateur(string email, string motDePasse)
         {
             try
             {
+                Console.WriteLine($"Debug: Recherche dans adherents pour Email: {email}");
                 string queryAdherent = "SELECT ID, Nom, Prenom, 'Adherent' AS Role FROM adherents WHERE Email = @Email AND MotDePasse = @MotDePasse";
                 using (var reader = ExecuteReader(queryAdherent, new Dictionary<string, object>
         {
@@ -106,14 +123,10 @@ namespace Gestion_activite
                 {
                     if (reader.Read())
                     {
-                        if (!int.TryParse(reader["ID"].ToString(), out int adherentID))
-                        {
-                            throw new Exception("ID de l'adhérent n'est pas dans le bon format.");
-                        }
-
+                        Console.WriteLine("Debug: Utilisateur trouvé dans adherents.");
                         return new Dictionary<string, object>
                 {
-                    { "ID", adherentID },
+                    { "ID", reader["ID"].ToString() },
                     { "Nom", reader["Nom"].ToString() },
                     { "Prenom", reader["Prenom"].ToString() },
                     { "Email", email },
@@ -122,6 +135,7 @@ namespace Gestion_activite
                     }
                 }
 
+                Console.WriteLine($"Debug: Recherche dans administrateurs pour Email: {email}");
                 string queryAdmin = "SELECT ID, Nom, Prenom, 'Admin' AS Role FROM administrateurs WHERE Email = @Email AND MotDePasse = @MotDePasse";
                 using (var reader = ExecuteReader(queryAdmin, new Dictionary<string, object>
         {
@@ -131,14 +145,10 @@ namespace Gestion_activite
                 {
                     if (reader.Read())
                     {
-                        if (!int.TryParse(reader["ID"].ToString(), out int adminID))
-                        {
-                            throw new Exception("ID de l'administrateur n'est pas dans le bon format.");
-                        }
-
+                        Console.WriteLine("Debug: Utilisateur trouvé dans administrateurs.");
                         return new Dictionary<string, object>
                 {
-                    { "ID", adminID },
+                    { "ID", reader.GetInt32("ID") },
                     { "Nom", reader["Nom"].ToString() },
                     { "Prenom", reader["Prenom"].ToString() },
                     { "Email", email },
@@ -147,17 +157,19 @@ namespace Gestion_activite
                     }
                 }
 
+                Console.WriteLine("Debug: Aucun utilisateur trouvé.");
                 return null;
-            }
-            catch (FormatException ex)
-            {
-                throw new Exception($"Format incorrect lors de l'authentification : {ex.Message}");
             }
             catch (Exception ex)
             {
-                throw new Exception($"Erreur générale : {ex.Message}");
+                Console.WriteLine($"Erreur dans AuthentifierUtilisateur: {ex.Message}");
+                throw;
             }
         }
+
+
+
+
 
 
 
@@ -237,13 +249,23 @@ namespace Gestion_activite
         {
             try
             {
-                string query = "SELECT COUNT(*) FROM adherents WHERE Email = @Email AND MotDePasse = @MotDePasse";
+                string query = @"
+            SELECT COUNT(*) 
+            FROM adherents 
+            WHERE Email = @Email AND MotDePasse = @MotDePasse
+            UNION ALL
+            SELECT COUNT(*) 
+            FROM administrateurs 
+            WHERE Email = @Email AND MotDePasse = @MotDePasse";
+
                 using (var command = new MySqlCommand(query, GetConnection()))
                 {
                     command.Parameters.AddWithValue("@Email", email);
                     command.Parameters.AddWithValue("@MotDePasse", motDePasse);
 
                     int count = Convert.ToInt32(command.ExecuteScalar());
+                    Console.WriteLine($"Debug: Nombre d'utilisateurs trouvés = {count}");
+
                     return count > 0;
                 }
             }
@@ -253,6 +275,8 @@ namespace Gestion_activite
                 return false;
             }
         }
+
+
 
 
 

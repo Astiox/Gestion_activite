@@ -67,24 +67,19 @@ namespace Gestion_activite
             BoutonAjoutActivite.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
             BoutonListeAdherents.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
 
-            ConnexionStatusCircle.Fill = isLoggedIn ? new SolidColorBrush(Microsoft.UI.Colors.Green) : new SolidColorBrush(Microsoft.UI.Colors.Red);
-        }
+            ConnexionStatusCircle.Fill = isLoggedIn
+                ? new SolidColorBrush(Microsoft.UI.Colors.Green)
+                : new SolidColorBrush(Microsoft.UI.Colors.Red);
 
-        private void DisplayUserInfo()
-        {
-            var utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
-            if (utilisateurConnecte != null)
+            if (isLoggedIn)
             {
-                string role = utilisateurConnecte["Role"].ToString();
-                string nom = utilisateurConnecte["Nom"].ToString();
-                Console.WriteLine($"Connecté en tant que {role}: {nom}");
+                Console.WriteLine($"Utilisateur connecté : {utilisateurConnecte["Nom"]} ({utilisateurConnecte["Role"]})");
             }
             else
             {
                 Console.WriteLine("Aucun utilisateur connecté.");
             }
         }
-
 
         private async void ConnexionButton_Click(object sender, RoutedEventArgs e)
         {
@@ -111,66 +106,37 @@ namespace Gestion_activite
                 XamlRoot = this.XamlRoot
             };
 
-            loginDialog.PrimaryButtonClick += async (dlgSender, dlgArgs) =>
+            loginDialog.PrimaryButtonClick += (dlgSender, dlgArgs) =>
             {
-                try
+                string email = emailInput.Text;
+                string password = passwordInput.Password;
+
+                if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 {
-                    string email = emailInput.Text;
-                    string password = passwordInput.Password;
-
-                    if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-                    {
-                        errorMessage.Text = "Veuillez remplir tous les champs.";
-                        errorMessage.Visibility = Visibility.Visible;
-                        dlgArgs.Cancel = true;
-                        return;
-                    }
-
-                    if (!SingletonBDD.GetInstance().EmailExiste(email))
-                    {
-                        errorMessage.Text = "Mot de passe ou adresse email incorrect.";
-                        errorMessage.Visibility = Visibility.Visible;
-                        dlgArgs.Cancel = true;
-                        return;
-                    }
-
-                    if (!SingletonBDD.GetInstance().VerifierConnexion(email, password))
-                    {
-                        errorMessage.Text = "Mot de passe ou adresse email incorrect.";
-                        errorMessage.Visibility = Visibility.Visible;
-                        dlgArgs.Cancel = true;
-                        return;
-                    }
-
-                    var utilisateur = SingletonBDD.GetInstance().AuthentifierUtilisateur(email, password);
-                    SingletonBDD.SetUtilisateurConnecte(utilisateur);
-
-                    UpdateButtonStates();
-
-                    dlgArgs.Cancel = false;
+                    errorMessage.Text = "Veuillez remplir tous les champs.";
+                    errorMessage.Visibility = Visibility.Visible;
+                    dlgArgs.Cancel = true;
+                    return;
                 }
-                catch (Exception ex)
+
+                var utilisateur = SingletonBDD.GetInstance().AuthentifierUtilisateur(email, password);
+
+                if (utilisateur != null)
                 {
-                    errorMessage.Text = $"Erreur : {ex.Message}";
+                    SingletonBDD.SetUtilisateurConnecte(utilisateur);
+                    Console.WriteLine($"Utilisateur connecté : {utilisateur["Nom"]} ({utilisateur["Role"]})");
+                    UpdateButtonStates();
+                }
+                else
+                {
+                    errorMessage.Text = "Mot de passe ou adresse email incorrect.";
                     errorMessage.Visibility = Visibility.Visible;
                     dlgArgs.Cancel = true;
                 }
             };
 
-
-            try
-            {
-                await loginDialog.ShowAsync();
-            }
-            catch (InvalidOperationException)
-            {
-                errorMessage.Text = "Une autre fenêtre de dialogue est déjà ouverte. Veuillez fermer l'autre dialogue.";
-                errorMessage.Visibility = Visibility.Visible;
-            }
+            await loginDialog.ShowAsync();
         }
-
-
-
 
         private void InscriptionButton_Click(object sender, RoutedEventArgs e)
         {
@@ -179,9 +145,20 @@ namespace Gestion_activite
 
         private void DeconnexionButton_Click(object sender, RoutedEventArgs e)
         {
-            SingletonBDD.Deconnecter();
-            UpdateButtonStates();
+            try
+            {
+                SingletonBDD.Deconnecter();
+
+                UpdateButtonStates();
+
+                Console.WriteLine("Utilisateur déconnecté avec succès.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la déconnexion : {ex.Message}");
+            }
         }
+
 
         private void BoutonAjoutActivite_Click(object sender, RoutedEventArgs e)
         {
@@ -206,6 +183,7 @@ namespace Gestion_activite
             base.OnNavigatedTo(e);
             UpdateButtonStates();
         }
+
         private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             if (sender is Grid grid)
@@ -229,7 +207,7 @@ namespace Gestion_activite
                 }
             }
         }
-
     }
+
 }
 
