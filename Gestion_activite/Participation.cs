@@ -8,14 +8,17 @@ namespace Gestion_activite
 {
     internal class Participation
     {
-        public int ID { get; set; }
-        public int AdherentID { get; set; }
-        public int SeanceID { get; set; }
-        public decimal? Note { get; set; }
+        
+            public int ID { get; set; }
+            public string AdherentID { get; set; }
+            public int SeanceID { get; set; }
+            public decimal? Note { get; set; }
+        
+
 
         public Participation() { }
 
-        public Participation(int id, int adherentID, int seanceID, decimal? note)
+        public Participation(int id, string adherentID, int seanceID, decimal? note)
         {
             ID = id;
             AdherentID = adherentID;

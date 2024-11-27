@@ -25,11 +25,13 @@ namespace Gestion_activite
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class PageDetails : Page
+     public sealed partial class PageDetails : Page
     {
         public Activite SelectedActivite { get; set; }
         public ObservableCollection<string> DatesDisponibles { get; set; } = new ObservableCollection<string>();
-        public ObservableCollection<HoraireSelection> HorairesDisponibles { get; set; } = new ObservableCollection<HoraireSelection>();
+        public ObservableCollection<string> HorairesDisponibles { get; set; } = new ObservableCollection<string>();
+        public string HoraireSelectionne { get; set; }
+
 
         public PageDetails()
         {
@@ -67,11 +69,6 @@ namespace Gestion_activite
             DatesDisponiblesComboBox.ItemsSource = DatesDisponibles;
         }
 
-        private void RetourButton_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(PageAccueil));
-        }
-
         private void DatesDisponiblesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DatesDisponiblesComboBox.SelectedItem is string selectedDateString &&
@@ -90,15 +87,18 @@ namespace Gestion_activite
             {
                 if (seance.PlacesRestantes > 0)
                 {
-                    HorairesDisponibles.Add(new HoraireSelection
-                    {
-                        Horaire = seance.Horaire.ToString(@"hh\:mm"),
-                        IsSelected = false
-                    });
+                    HorairesDisponibles.Add(seance.Horaire.ToString(@"hh\:mm"));
                 }
             }
 
-            HorairesList.ItemsSource = HorairesDisponibles;
+            HorairesComboBox.ItemsSource = HorairesDisponibles;
+            HoraireSelectionne = null; 
+        }
+
+
+        private void RetourButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageAccueil));
         }
 
         private async void ConfirmerButton_Click(object sender, RoutedEventArgs e)
@@ -110,14 +110,13 @@ namespace Gestion_activite
                 utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
                 if (utilisateurConnecte == null)
                 {
-                    return; // L'utilisateur n'est toujours pas connecté
+                    return;
                 }
             }
 
             try
             {
-                var horairesSelectionnes = HorairesDisponibles.FirstOrDefault(h => h.IsSelected);
-                if (horairesSelectionnes == null)
+                if (string.IsNullOrEmpty(HoraireSelectionne))
                 {
                     await new ContentDialog
                     {
@@ -129,29 +128,46 @@ namespace Gestion_activite
                     return;
                 }
 
+                var selectedDate = DateTime.ParseExact((string)DatesDisponiblesComboBox.SelectedItem, "dd/MM/yyyy", null);
                 var seanceCorrespondante = SingletonBDD.GetInstance()
-                    .GetSeances(SelectedActivite.ID,
-                                DateTime.ParseExact((string)DatesDisponiblesComboBox.SelectedItem, "dd/MM/yyyy", null))
-                    .FirstOrDefault(s => s.Horaire.ToString(@"hh\:mm") == horairesSelectionnes.Horaire);
+                    .GetSeances(SelectedActivite.ID, selectedDate)
+                    .FirstOrDefault(s => s.Horaire.ToString(@"hh\:mm") == HoraireSelectionne);
 
                 if (seanceCorrespondante != null)
                 {
-                    int adherentID = (int)utilisateurConnecte["ID"]; 
+                    string adherentID = utilisateurConnecte["ID"].ToString();
+                    decimal? note = null;
+
+                    var dialog = new ContentDialog
+                    {
+                        Title = "Avez-vous déjà participé à cette activité ?",
+                        PrimaryButtonText = "Oui",
+                        SecondaryButtonText = "Non",
+                        CloseButtonText = "Annuler",
+                        XamlRoot = this.XamlRoot
+                    };
+
+                    var result = await dialog.ShowAsync();
+
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        note = await DemanderNoteAsync();
+                        if (note == null) return;
+                    }
+
                     SingletonBDD.GetInstance().ReserverPlace(seanceCorrespondante.ID);
-                    SingletonBDD.GetInstance().AjouterParticipation(adherentID, seanceCorrespondante.ID, null);
+                    SingletonBDD.GetInstance().AjouterParticipation(adherentID, seanceCorrespondante.ID, note);
 
-                    HorairesDisponibles.Remove(horairesSelectionnes);
+                    await new ContentDialog
+                    {
+                        Title = "Réservation réussie",
+                        Content = "Votre réservation a été enregistrée avec succès.",
+                        CloseButtonText = "OK",
+                        XamlRoot = this.XamlRoot
+                    }.ShowAsync();
+
+                    Frame.Navigate(typeof(PageAccueil));
                 }
-
-                await new ContentDialog
-                {
-                    Title = "Réservation confirmée",
-                    Content = $"Votre participation pour l'horaire {horairesSelectionnes.Horaire} a été enregistrée.",
-                    CloseButtonText = "OK",
-                    XamlRoot = this.XamlRoot
-                }.ShowAsync();
-
-                LoadHorairesDisponibles(DateTime.ParseExact((string)DatesDisponiblesComboBox.SelectedItem, "dd/MM/yyyy", null));
             }
             catch (Exception ex)
             {
@@ -165,6 +181,103 @@ namespace Gestion_activite
             }
         }
 
+
+        private async Task<decimal?> DemanderNoteAsync()
+        {
+            StackPanel contentPanel = new StackPanel { Spacing = 10 };
+
+            TextBlock textBlock = new TextBlock
+            {
+                Text = "Veuillez noter l'activité sur 5 étoiles :",
+                FontSize = 16
+            };
+
+            RatingControl ratingControl = new RatingControl
+            {
+                MaxRating = 5,
+                PlaceholderValue = 0
+            };
+
+            contentPanel.Children.Add(textBlock);
+            contentPanel.Children.Add(ratingControl);
+
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = "Note de l'activité",
+                Content = contentPanel,
+                PrimaryButtonText = "Valider",
+                CloseButtonText = "Annuler",
+                XamlRoot = this.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary && ratingControl.Value > 0)
+            {
+                return (decimal)ratingControl.Value;
+            }
+            return null;
+        }
+
+
+
+
+        private async Task DemanderNoteAsync(string adherentID, int seanceID)
+        {
+            StackPanel contentPanel = new StackPanel { Spacing = 10 };
+
+            TextBlock textBlock = new TextBlock
+            {
+                Text = "Veuillez noter l'activité sur 5 étoiles :",
+                FontSize = 16
+            };
+
+            RatingControl ratingControl = new RatingControl
+            {
+                MaxRating = 5,
+                PlaceholderValue = 0
+            };
+
+            contentPanel.Children.Add(textBlock);
+            contentPanel.Children.Add(ratingControl);
+
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = "Note de l'activité",
+                Content = contentPanel,
+                PrimaryButtonText = "Valider",
+                CloseButtonText = "Annuler",
+                XamlRoot = this.XamlRoot
+            };
+
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                decimal note = (decimal)ratingControl.Value;
+
+                try
+                {
+                    SingletonBDD.GetInstance().AjouterParticipation(adherentID, seanceID, note);
+
+                    await new ContentDialog
+                    {
+                        Title = "Merci !",
+                        Content = "Votre note a été enregistrée avec succès.",
+                        CloseButtonText = "OK",
+                        XamlRoot = this.XamlRoot
+                    }.ShowAsync();
+                }
+                catch (Exception ex)
+                {
+                    await new ContentDialog
+                    {
+                        Title = "Erreur",
+                        Content = $"Une erreur est survenue lors de l'enregistrement de la note : {ex.Message}",
+                        CloseButtonText = "OK",
+                        XamlRoot = this.XamlRoot
+                    }.ShowAsync();
+                }
+            }
+        }
 
 
         private async Task DemanderConnexionOuInscriptionAsync()
@@ -221,7 +334,8 @@ namespace Gestion_activite
                 string email = emailInput.Text;
                 string password = passwordInput.Password;
 
-                if (!SingletonBDD.GetInstance().EmailExiste(email) || !SingletonBDD.GetInstance().VerifierConnexion(email, password))
+                if (!SingletonBDD.GetInstance().EmailExiste(email) ||
+                    !SingletonBDD.GetInstance().VerifierConnexion(email, password))
                 {
                     errorMessage.Text = "Adresse email ou mot de passe incorrect.";
                     errorMessage.Visibility = Visibility.Visible;
@@ -230,13 +344,12 @@ namespace Gestion_activite
                 else
                 {
                     var utilisateur = SingletonBDD.GetInstance().AuthentifierUtilisateur(email, password);
-                    SingletonBDD.SetUtilisateurConnecte(utilisateur); 
+                    SingletonBDD.SetUtilisateurConnecte(utilisateur);
                 }
             };
 
             await loginDialog.ShowAsync();
         }
-
     }
 }
 

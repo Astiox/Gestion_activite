@@ -32,6 +32,8 @@ namespace Gestion_activite
             this.InitializeComponent();
             Activites = new ObservableCollection<Activite>();
             ChargerActivitesDepuisBDD();
+            UpdateButtonStates();
+
         }
 
         private void ChargerActivitesDepuisBDD()
@@ -57,6 +59,7 @@ namespace Gestion_activite
         private void UpdateButtonStates()
         {
             var utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
+
             bool isLoggedIn = utilisateurConnecte != null;
             bool isAdmin = isLoggedIn && utilisateurConnecte["Role"].ToString() == "Admin";
 
@@ -80,6 +83,8 @@ namespace Gestion_activite
                 Console.WriteLine("Aucun utilisateur connecté.");
             }
         }
+
+
 
         private async void ConnexionButton_Click(object sender, RoutedEventArgs e)
         {
@@ -151,13 +156,15 @@ namespace Gestion_activite
 
                 UpdateButtonStates();
 
-                Console.WriteLine("Utilisateur déconnecté avec succès.");
+                Console.WriteLine("Déconnexion réussie.");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Erreur lors de la déconnexion : {ex.Message}");
             }
         }
+
+
 
 
         private void BoutonAjoutActivite_Click(object sender, RoutedEventArgs e)

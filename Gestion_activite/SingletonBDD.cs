@@ -58,8 +58,10 @@ namespace Gestion_activite
 
         public static void Deconnecter()
         {
-            UtilisateurConnecte = null;
+            SetUtilisateurConnecte(null); 
+            Console.WriteLine("Déconnexion effectuée : UtilisateurConnecte est maintenant null.");
         }
+
 
         public MySqlDataReader ExecuteReader(string query, Dictionary<string, object> parameters = null)
         {
@@ -102,10 +104,15 @@ namespace Gestion_activite
         {
             if (App.Current.Resources.ContainsKey("UtilisateurConnecte"))
             {
-                return App.Current.Resources["UtilisateurConnecte"] as Dictionary<string, object>;
+                var utilisateur = App.Current.Resources["UtilisateurConnecte"] as Dictionary<string, object>;
+                Console.WriteLine($"Récupéré : {utilisateur["Nom"]} ({utilisateur["Role"]})");
+                return utilisateur;
             }
+
+            Console.WriteLine("Aucun utilisateur connecté actuellement.");
             return null;
         }
+
 
 
 
@@ -509,7 +516,7 @@ namespace Gestion_activite
             string query = "DELETE FROM seances WHERE ID = @id";
             ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
         }
-        public List<Participation> ObtenirParticipations(int adherentID)
+        public List<Participation> ObtenirParticipations(string adherentID)
         {
             string query = "SELECT ID, AdherentID, SeanceID, Note FROM participations WHERE AdherentID = @AdherentID";
 
@@ -522,7 +529,7 @@ namespace Gestion_activite
                     participations.Add(new Participation
                     {
                         ID = reader.GetInt32("ID"),
-                        AdherentID = reader.GetInt32("AdherentID"),
+                        AdherentID = reader["AdherentID"].ToString(),
                         SeanceID = reader.GetInt32("SeanceID"),
                         Note = reader.IsDBNull(reader.GetOrdinal("Note")) ? null : reader.GetDecimal("Note")
                     });
@@ -530,16 +537,22 @@ namespace Gestion_activite
             }
             return participations;
         }
-        public void AjouterParticipation(int adherentID, int seanceID, decimal? note)
+
+        public void AjouterParticipation(string adherentID, int seanceID, decimal? note)
         {
-            string query = "INSERT INTO participations (AdherentID, SeanceID, Note) VALUES (@adherentID, @seanceID, @note)";
+            string query = "INSERT INTO participations (AdherentID, SeanceID, Note, DateParticipation) VALUES (@adherentID, @seanceID, @note, NOW())";
             ExecuteNonQuery(query, new Dictionary<string, object>
-            {
-                { "@adherentID", adherentID },
-                { "@seanceID", seanceID },
-                { "@note", (object)note ?? DBNull.Value }
-            });
+    {
+        { "@adherentID", adherentID },
+        { "@seanceID", seanceID },
+        { "@note", (object)note ?? DBNull.Value }
+    });
         }
+
+
+
+
+
 
         public ObservableCollection<Categorie> GetCategories()
         {

@@ -26,7 +26,7 @@ namespace Gestion_activite
             public decimal MoyenneNotes { get; set; }
             public int NombreParticipants { get; set; }
             public string Image { get; set; }
-            public string PrixVenteAffiche => $"{PrixVente:F2}$";
+            public string PrixFormate => $"{PrixVente:F2}$";
 
         }
 
