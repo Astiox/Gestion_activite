@@ -17,8 +17,13 @@ namespace Gestion_activite
         public Categorie(int id, string nomCategorie, string description)
         {
             ID = id;
-            NomCategorie = nomCategorie;
+            NomCategorie = nomCategorie; 
             Description = description;
+        }
+
+        public override string ToString()
+        {
+            return $"{NomCategorie} : {Description}";
         }
     }
 }

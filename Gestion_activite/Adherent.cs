@@ -8,16 +8,18 @@ namespace Gestion_activite
 {
     internal class Adherent
     {
-        public string ID { get; set; }
+        public int ID { get; set; }
         public string Nom { get; set; }
         public string Prenom { get; set; }
-        public DateTime? DateNaissance { get; set; }
+        public DateTime DateNaissance { get; set; }
         public string Adresse { get; set; }
         public DateTime DateInscription { get; set; }
+        public string Email { get; set; }
+        public string MotDePasse { get; set; }
 
         public Adherent() { }
 
-        public Adherent(string id, string nom, string prenom, DateTime? dateNaissance, string adresse, DateTime dateInscription)
+        public Adherent(int id, string nom, string prenom, DateTime dateNaissance, string adresse, DateTime dateInscription, string email, string motDePasse)
         {
             ID = id;
             Nom = nom;
@@ -25,6 +27,8 @@ namespace Gestion_activite
             DateNaissance = dateNaissance;
             Adresse = adresse;
             DateInscription = dateInscription;
+            Email = email;
+            MotDePasse = motDePasse;
         }
     }
 }

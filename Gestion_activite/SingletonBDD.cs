@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using Gestion_activite;
+using Gestion_activite.Gestion_activite;
 
 
 namespace Gestion_activite
@@ -50,6 +53,7 @@ namespace Gestion_activite
                 command.ExecuteNonQuery();
             }
         }
+
         public static Dictionary<string, object> UtilisateurConnecte { get; set; }
 
         public static void Deconnecter()
@@ -78,6 +82,7 @@ namespace Gestion_activite
             App.Current.Resources["UtilisateurConnecte"] = utilisateur;
         }
 
+
         public static Dictionary<string, object> GetUtilisateurConnecte()
         {
             if (App.Current.Resources.ContainsKey("UtilisateurConnecte"))
@@ -87,35 +92,76 @@ namespace Gestion_activite
             return null;
         }
 
+
         public Dictionary<string, object> AuthentifierUtilisateur(string email, string motDePasse)
         {
-            string query = "SELECT ID, Nom, Prenom FROM adherents WHERE Email = @Email AND MotDePasse = @MotDePasse";
-            using (var reader = ExecuteReader(query, new Dictionary<string, object>
-    {
-        { "@Email", email },
-        { "@MotDePasse", motDePasse }
-    }))
+            try
             {
-                if (reader.Read())
+                string queryAdherent = "SELECT ID, Nom, Prenom, 'Adherent' AS Role FROM adherents WHERE Email = @Email AND MotDePasse = @MotDePasse";
+                using (var reader = ExecuteReader(queryAdherent, new Dictionary<string, object>
+        {
+            { "@Email", email },
+            { "@MotDePasse", motDePasse }
+        }))
                 {
-                    int id;
-                    if (!int.TryParse(reader["ID"].ToString(), out id))
+                    if (reader.Read())
                     {
-                        throw new FormatException("La valeur de l'ID utilisateur n'est pas au bon format.");
+                        if (!int.TryParse(reader["ID"].ToString(), out int adherentID))
+                        {
+                            throw new Exception("ID de l'adhérent n'est pas dans le bon format.");
+                        }
+
+                        return new Dictionary<string, object>
+                {
+                    { "ID", adherentID },
+                    { "Nom", reader["Nom"].ToString() },
+                    { "Prenom", reader["Prenom"].ToString() },
+                    { "Email", email },
+                    { "Role", "Adherent" }
+                };
                     }
-
-                    return new Dictionary<string, object>
-            {
-                { "ID", id },
-                { "Nom", reader["Nom"].ToString() },
-                { "Prenom", reader["Prenom"].ToString() },
-                { "Email", email }
-            };
                 }
-            }
 
-            return null; 
+                string queryAdmin = "SELECT ID, Nom, Prenom, 'Admin' AS Role FROM administrateurs WHERE Email = @Email AND MotDePasse = @MotDePasse";
+                using (var reader = ExecuteReader(queryAdmin, new Dictionary<string, object>
+        {
+            { "@Email", email },
+            { "@MotDePasse", motDePasse }
+        }))
+                {
+                    if (reader.Read())
+                    {
+                        if (!int.TryParse(reader["ID"].ToString(), out int adminID))
+                        {
+                            throw new Exception("ID de l'administrateur n'est pas dans le bon format.");
+                        }
+
+                        return new Dictionary<string, object>
+                {
+                    { "ID", adminID },
+                    { "Nom", reader["Nom"].ToString() },
+                    { "Prenom", reader["Prenom"].ToString() },
+                    { "Email", email },
+                    { "Role", "Admin" }
+                };
+                    }
+                }
+
+                return null;
+            }
+            catch (FormatException ex)
+            {
+                throw new Exception($"Format incorrect lors de l'authentification : {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erreur générale : {ex.Message}");
+            }
         }
+
+
+
+
 
 
         public bool EmailExiste(string email)
@@ -132,10 +178,12 @@ namespace Gestion_activite
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erreur lors de la vérification de l'email : {ex.Message}");
+                Console.WriteLine($"Erreur EmailExiste: {ex.Message}");
                 return false;
             }
         }
+
+
         public ObservableCollection<DateTime> getDateSeance()
         {
             ObservableCollection<DateTime> resultats = new ObservableCollection<DateTime>();
@@ -149,7 +197,7 @@ namespace Gestion_activite
                     {
                         while (reader.Read())
                         {
-                            resultats.Add(reader.GetDateTime("Date")); 
+                            resultats.Add(reader.GetDateTime("Date"));
                         }
                     }
                 }
@@ -189,11 +237,11 @@ namespace Gestion_activite
         {
             try
             {
-                string query = "SELECT COUNT(*) FROM adherents WHERE Email = @Email AND motDePasse = @motDePasse";
+                string query = "SELECT COUNT(*) FROM adherents WHERE Email = @Email AND MotDePasse = @MotDePasse";
                 using (var command = new MySqlCommand(query, GetConnection()))
                 {
                     command.Parameters.AddWithValue("@Email", email);
-                    command.Parameters.AddWithValue("@motDePasse", motDePasse);
+                    command.Parameters.AddWithValue("@MotDePasse", motDePasse);
 
                     int count = Convert.ToInt32(command.ExecuteScalar());
                     return count > 0;
@@ -201,14 +249,15 @@ namespace Gestion_activite
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erreur lors de la vérification de la connexion : {ex.Message}");
+                Console.WriteLine($"Erreur VerifierConnexion: {ex.Message}");
                 return false;
             }
         }
 
 
 
-        public void ModifierAdherent(string id, string nom, string prenom, DateTime dateNaissance, string adresse)
+
+        public void ModifierAdherent(int id, string nom, string prenom, DateTime dateNaissance, string adresse)
         {
             string query = "UPDATE adherents SET Nom = @nom, Prenom = @prenom, DateNaissance = @dateNaissance, Adresse = @adresse WHERE ID = @id";
             ExecuteNonQuery(query, new Dictionary<string, object>
@@ -221,74 +270,62 @@ namespace Gestion_activite
             });
         }
 
-        public void SupprimerAdherent(string id)
+        public void SupprimerAdherent(int id)
         {
             string query = "DELETE FROM adherents WHERE ID = @id";
             ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
         }
 
-        public List<Dictionary<string, object>> Obteniradherents()
+        public List<Dictionary<string, object>> ObtenirAdherents()
         {
-            string query = "SELECT * FROM adherents";
-            var liste = new List<Dictionary<string, object>>();
+            string query = "SELECT ID, Nom, Prenom, DateNaissance, Adresse, Email FROM adherents";
+            var adherents = new List<Dictionary<string, object>>();
+
             using (var reader = ExecuteReader(query))
             {
                 while (reader.Read())
                 {
-                    var adherent = new Dictionary<string, object>
+                    adherents.Add(new Dictionary<string, object>
                     {
-                        { "ID", reader["ID"] },
-                        { "Nom", reader["Nom"] },
-                        { "Prenom", reader["Prenom"] },
+                        { "ID", reader.GetInt32("ID") },
+                        { "Nom", reader["Nom"].ToString() },
+                        { "Prenom", reader["Prenom"].ToString() },
                         { "DateNaissance", reader["DateNaissance"] },
-                        { "Adresse", reader["Adresse"] },
-                        { "DateInscription", reader["DateInscription"] }
-                    };
-                    liste.Add(adherent);
+                        { "Adresse", reader["Adresse"].ToString() },
+                        { "Email", reader["Email"].ToString() }
+                    });
                 }
             }
-            return liste;
+
+            return adherents;
         }
         public ObservableCollection<Activite> GetActivites()
         {
             var activites = new ObservableCollection<Activite>();
-            try
+            string query = "SELECT * FROM activites";
+
+            using (var reader = ExecuteReader(query))
             {
-                string query = "SELECT ID, Nom, CategorieID, Description, CoutOrganisation, PrixVente, MoyenneNotes, NombreParticipants, ImageUrl FROM activites";
-                using (var command = new MySqlCommand(query, GetConnection()))
+                while (reader.Read())
                 {
-                    using (var reader = command.ExecuteReader())
+                    activites.Add(new Activite
                     {
-                        while (reader.Read())
-                        {
-                            var activite = new Activite
-                            {
-                                ID = reader.GetInt32("ID"),
-                                Nom = reader.GetString("Nom"),
-                                CategorieID = reader.GetInt32("CategorieID"),
-                                Description = reader.GetString("Description"),
-                                CoutOrganisation = reader.GetDecimal("CoutOrganisation"),
-                                PrixVente = reader.GetDecimal("PrixVente"),
-                                MoyenneNotes = reader.IsDBNull(reader.GetOrdinal("MoyenneNotes")) ? 0 : reader.GetDecimal("MoyenneNotes"),
-                                NombreParticipants = reader.GetInt32("NombreParticipants"),
-                                Image = reader.IsDBNull(reader.GetOrdinal("ImageUrl")) ? "Assets/default.jpg" : reader.GetString("ImageUrl")
-                            };
-                            activites.Add(activite);
-                        }
-                    }
+                        ID = reader.GetInt32("ID"),
+                        Nom = reader.GetString("Nom"),
+                        CategorieID = reader.GetInt32("CategorieID"),
+                        Description = reader.GetString("Description"),
+                        CoutOrganisation = reader.GetDecimal("CoutOrganisation"),
+                        PrixVente = reader.GetDecimal("PrixVente"),
+                        MoyenneNotes = reader.IsDBNull(reader.GetOrdinal("MoyenneNotes")) ? 0 : reader.GetDecimal("MoyenneNotes"),
+                        NombreParticipants = reader.GetInt32("NombreParticipants"),
+                        Image = reader.IsDBNull(reader.GetOrdinal("ImageUrl")) ? "Assets/default.jpg" : reader.GetString("ImageUrl")
+                    });
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erreur lors de la récupération des activités : {ex.Message}");
-            }
-            finally
-            {
-                CloseConnection();
             }
 
             return activites;
         }
+
 
 
 
@@ -306,6 +343,13 @@ namespace Gestion_activite
             });
         }
 
+        public void SupprimerActivite(int id)
+        {
+            string query = "DELETE FROM activites WHERE ID = @id";
+            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+        }
+
+
         public void ModifierActivite(int id, string nom, int categorieID, string description, decimal coutOrganisation, decimal prixVente)
         {
             string query = "UPDATE activites SET Nom = @nom, CategorieID = @categorieID, Description = @description, CoutOrganisation = @coutOrganisation, PrixVente = @prixVente WHERE ID = @id";
@@ -320,11 +364,7 @@ namespace Gestion_activite
             });
         }
 
-        public void SupprimerActivite(int id)
-        {
-            string query = "DELETE FROM activites WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
-        }
+
 
         public List<Dictionary<string, object>> Obteniractivites()
         {
@@ -371,8 +411,8 @@ namespace Gestion_activite
 
         public List<Seance> GetSeances(int activiteID, DateTime date)
         {
-            List<Seance> seances = new List<Seance>();
-            string query = "SELECT ID, ActiviteID, Date, Horaire, PlacesDisponibles, PlacesTotales FROM seances WHERE ActiviteID = @activiteID AND Date = @date";
+            var seances = new List<Seance>();
+            string query = "SELECT * FROM seances WHERE ActiviteID = @activiteID AND Date = @date";
 
             using (var command = new MySqlCommand(query, GetConnection()))
             {
@@ -389,8 +429,8 @@ namespace Gestion_activite
                             ActiviteID = reader.GetInt32("ActiviteID"),
                             Date = reader.GetDateTime("Date"),
                             Horaire = reader.GetTimeSpan("Horaire"),
-                            PlacesRestantes = reader.GetInt32("PlacesDisponibles"),
-                            PlacesTotales = reader.GetInt32("PlacesTotales")
+                            PlacesRestantes = reader.GetInt32("PlacesRestantes"),
+                            PlacesTotales = reader.GetInt32("PlacesTotales"),
                         });
                     }
                 }
@@ -402,7 +442,7 @@ namespace Gestion_activite
 
         public void ReserverPlace(int seanceID)
         {
-            string query = "UPDATE seances SET PlacesDisponibles = PlacesDisponibles - 1 WHERE ID = @seanceID AND PlacesDisponibles > 0";
+            string query = "UPDATE seances SET PlacesRestantes = PlacesRestantes - 1 WHERE ID = @seanceID AND PlacesRestantes > 0";
             using (var command = new MySqlCommand(query, GetConnection()))
             {
                 command.Parameters.AddWithValue("@seanceID", seanceID);
@@ -416,23 +456,35 @@ namespace Gestion_activite
         }
 
 
-        public void AjouterSeance(int activiteID, DateTime dateSeance, int placesDisponibles)
+        public void AjouterSeance(int activiteID, DateTime date, TimeSpan horaire, int placesTotales)
+        {
+            string query = "INSERT INTO seances (ActiviteID, Date, Horaire, PlacesRestantes, PlacesTotales) VALUES (@activiteID, @date, @horaire, @placesTotales, @placesTotales)";
+            ExecuteNonQuery(query, new Dictionary<string, object>
             {
-                string query = "INSERT INTO seances (ActiviteID, DateSeance, PlacesDisponibles, PlacesRestantes) VALUES (@activiteID, @dateSeance, @placesDisponibles, @placesDisponibles)";
-                ExecuteNonQuery(query, new Dictionary<string, object>
-    {
-        { "@activiteID", activiteID },
-        { "@dateSeance", dateSeance },
-        { "@placesDisponibles", placesDisponibles }
-    });
-            }
+                { "@activiteID", activiteID },
+                { "@date", date },
+                { "@horaire", horaire },
+                { "@placesTotales", placesTotales }
+            });
+        }
 
-
-            public void SupprimerSeance(int id)
+        public void ModifierSeance(int id, DateTime date, TimeSpan horaire, int placesTotales)
+        {
+            string query = "UPDATE seances SET Date = @date, Horaire = @horaire, PlacesTotales = @placesTotales, PlacesRestantes = @placesTotales WHERE ID = @id";
+            ExecuteNonQuery(query, new Dictionary<string, object>
             {
-                string query = "DELETE FROM seances WHERE ID = @id";
-                ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
-            }
+                { "@id", id },
+                { "@date", date },
+                { "@horaire", horaire },
+                { "@placesTotales", placesTotales }
+            });
+        }
+
+        public void SupprimerSeance(int id)
+        {
+            string query = "DELETE FROM seances WHERE ID = @id";
+            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+        }
         public List<Participation> ObtenirParticipations(int adherentID)
         {
             string query = "SELECT ID, AdherentID, SeanceID, Note FROM participations WHERE AdherentID = @AdherentID";
@@ -454,43 +506,65 @@ namespace Gestion_activite
             }
             return participations;
         }
-        private void ChargerParticipations()
-        {
-            if (SingletonBDD.UtilisateurConnecte != null)
-            {
-                int adherentID = (int)SingletonBDD.UtilisateurConnecte["ID"];
-                var participations = SingletonBDD.GetInstance().ObtenirParticipations(adherentID);
-
-                foreach (var participation in participations)
-                {
-                    Console.WriteLine($"Participation ID: {participation.ID}, Seance ID: {participation.SeanceID}, Note: {participation.Note}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Aucun utilisateur connecté.");
-            }
-        }
-
         public void AjouterParticipation(int adherentID, int seanceID, decimal? note)
         {
-            string query = "INSERT INTO participations (AdherentID, SeanceID, Note) VALUES (@AdherentID, @SeanceID, @Note)";
-
+            string query = "INSERT INTO participations (AdherentID, SeanceID, Note) VALUES (@adherentID, @seanceID, @note)";
             ExecuteNonQuery(query, new Dictionary<string, object>
-    {
-        { "@AdherentID", adherentID },
-        { "@SeanceID", seanceID },
-        { "@Note", (object)note ?? DBNull.Value }
-    });
-        }
-
-
-
-
-        public void SupprimerParticipation(int id)
             {
-                string query = "DELETE FROM participations WHERE ID = @id";
-                ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
-            }
+                { "@adherentID", adherentID },
+                { "@seanceID", seanceID },
+                { "@note", (object)note ?? DBNull.Value }
+            });
         }
+
+        public ObservableCollection<Categorie> GetCategories()
+        {
+            var categories = new ObservableCollection<Categorie>();
+            string query = "SELECT * FROM categories";
+
+            using (var reader = ExecuteReader(query))
+            {
+                while (reader.Read())
+                {
+                    categories.Add(new Categorie
+                    {
+                        ID = reader.GetInt32("ID"),
+                        NomCategorie = reader.GetString("Nom"),
+                        Description = reader.GetString("Description")
+                    });
+                }
+            }
+            return categories;
+        }
+
+        public void AjouterCategorie(string nom, string description)
+        {
+            string query = "INSERT INTO categories (Nom, Description) VALUES (@nom, @description)";
+            ExecuteNonQuery(query, new Dictionary<string, object>
+            {
+                { "@nom", nom },
+                { "@description", description }
+            });
+        }
+
+        public void ModifierCategorie(int id, string nom, string description)
+        {
+            string query = "UPDATE categories SET Nom = @nom, Description = @description WHERE ID = @id";
+            ExecuteNonQuery(query, new Dictionary<string, object>
+            {
+                { "@id", id },
+                { "@nom", nom },
+                { "@description", description }
+            });
+        }
+
+        public void SupprimerCategorie(int id)
+        {
+            string query = "DELETE FROM categories WHERE ID = @id";
+            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+        }
+
+        
     }
+}
+ 

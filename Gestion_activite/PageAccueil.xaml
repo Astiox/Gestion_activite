@@ -4,117 +4,156 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Gestion_activite"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local1="using:Gestion_activite.Gestion_activite"
     mc:Ignorable="d"
     Background="#2e3a4f">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="4*" />
-            <RowDefinition Height="3*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Background="Transparent">
-            <Image Source="Assets/backgroundAccueil.png" Stretch="Fill" />
+        <Image Source="Assets/backgroundAccueil.png" 
+               Grid.Row="0" 
+               Stretch="Fill" 
+               Opacity="0.3" 
+               Grid.RowSpan="2" />
 
-            <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <Grid Grid.Row="0" Padding="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <Image Source="Assets/odyssea_logo.png"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"
-                       Width="60"
-                       Height="60"
-                       Margin="0,10,10,0" />
+            <Image Source="Assets/odyssea_logo.png" 
+                   Width="80" 
+                   Height="80" 
+                   VerticalAlignment="Center" 
+                   Grid.Column="0" />
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="70,10,10,0">
-                    <Ellipse x:Name="ConnexionStatusCircle"
-                             Width="20" Height="20"
-                             Fill="Red"
-                             VerticalAlignment="Center"
-                             Margin="5" />
-                    <Button x:Name="ConnexionButton" Content="Connexion"
-                            Width="120"
-                            Background="#4CAF50"
-                            Foreground="White"
-                            BorderBrush="Transparent"
-                            CornerRadius="15"
-                            Margin="5"
-                            PointerEntered="ConnexionButton_PointerEntered"
-                            PointerExited="ConnexionButton_PointerExited"
-                            Click="ConnexionButton_Click" />
-                    
-                    <Button x:Name="InscriptionButton" Content="Inscription"
-                            Width="120"
-                            Background="#2196F3"
-                            Foreground="White"
-                            BorderBrush="Transparent"
-                            CornerRadius="15"
-                            Margin="5"
-                            Click="InscriptionButton_Click" />
-                    <Button x:Name="DeconnexionButton" Content="Déconnexion"
-                            Width="120"
-                            Background="#FF0000"
-                            Foreground="White"
-                            BorderBrush="Transparent"
-                            CornerRadius="15"
-                            Click="DeconnexionButton_Click"
-                            Visibility="Collapsed" />
-                </StackPanel>
-            </Grid>
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Spacing="10"
+                        Grid.Column="1">
+                <Ellipse x:Name="ConnexionStatusCircle"
+             Width="20"
+             Height="20"
+             Fill="Red"
+             VerticalAlignment="Center"
+             Margin="0,0,10,0" />
+                <Button x:Name="ConnexionButton"
+                        Content="Connexion"
+                        Width="120"
+                        Background="#4CAF50"
+                        Foreground="White"
+                        BorderBrush="Transparent"
+                        CornerRadius="15"
+                        Click="ConnexionButton_Click" />
+                <Button x:Name="InscriptionButton"
+                        Content="Inscription"
+                        Width="120"
+                        Background="#2196F3"
+                        Foreground="White"
+                        BorderBrush="Transparent"
+                        CornerRadius="15"
+                        Click="InscriptionButton_Click" />
+                <Button x:Name="DeconnexionButton"
+                        Content="Déconnexion"
+                        Width="120"
+                        Background="#FF5722"
+                        Foreground="White"
+                        BorderBrush="Transparent"
+                        CornerRadius="15"
+                        Visibility="Collapsed"
+                        Click="DeconnexionButton_Click" />
+            </StackPanel>
+        </Grid>
 
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
-                <Border Background="#80000000" CornerRadius="10" Padding="10">
+        <ScrollViewer Grid.Row="1" Padding="20">
+            <StackPanel Spacing="20">
+
+                <Border Background="#80000000"
+                        CornerRadius="15"
+                        Padding="15"
+                        HorizontalAlignment="Center">
                     <TextBlock Text="Odyssea"
-                               FontSize="64"
+                               FontSize="48"
                                FontWeight="Bold"
                                Foreground="White"
                                HorizontalAlignment="Center" />
                 </Border>
-                <Border Background="#80000000" CornerRadius="10" Padding="10">
-                    <TextBlock Text="Explorez l'inconnu"
-                               FontSize="20"
-                               FontWeight="SemiBold"
-                               Foreground="White"
-                               HorizontalAlignment="Center" />
-                </Border>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Left"
+                            Spacing="10"
+                            Margin="0,10,0,0">
+                    <Button x:Name="BoutonAjoutActivite"
+                            Content="Ajouter Activité"
+                            Width="150"
+                            Background="#4CAF50"
+                            Foreground="White"
+                            BorderBrush="Transparent"
+                            CornerRadius="15"
+                            Click="BoutonAjoutActivite_Click"
+                            Visibility="Collapsed" />
+                    <Button x:Name="BoutonListeAdherents"
+                            Content="Liste des Adhérents"
+                            Width="150"
+                            Background="#2196F3"
+                            Foreground="White"
+                            BorderBrush="Transparent"
+                            CornerRadius="15"
+                            Click="BoutonListeAdherents_Click"
+                            Visibility="Collapsed" />
+                </StackPanel>
+
+                <ItemsControl ItemsSource="{x:Bind Activites}" x:Name="ictr_activite">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VariableSizedWrapGrid Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="local1:Activite">
+                            <Grid Width="300"
+                                  Height="400"
+                                  Margin="10"
+                                  PointerEntered="Grid_PointerEntered"
+                                  PointerExited="Grid_PointerExited"
+                                  PointerPressed="ActiviteCard_Click">
+                                <Border Background="#FFFFFF"
+                                        CornerRadius="15"
+                                        Padding="10"
+                                        Margin="10"
+                                        BorderBrush="#DDDDDD"
+                                        BorderThickness="1">
+                                    <Image Source="{x:Bind Image}" Stretch="UniformToFill" />
+                                </Border>
+
+                                <Border Background="#80000000"
+                                        CornerRadius="15"
+                                        Visibility="Collapsed"
+                                        x:Name="HoverOverlay">
+                                    <StackPanel HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Spacing="10">
+                                        <TextBlock Text="{x:Bind Nom}"
+                                                   FontSize="23"
+                                                   FontWeight="Bold"
+                                                   Foreground="White" />
+                                        <TextBlock Text="{x:Bind PrixVenteAffiche}"
+                                                   FontSize="24"
+                                                   FontWeight="Bold"
+                                                   Foreground="White" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </StackPanel>
-        </Grid>
-
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{x:Bind Activites}" x:Name="ictr_activite">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VariableSizedWrapGrid Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="local:Activite">
-                        <Grid Width="300" Height="400" Margin="10"
-      PointerEntered="Grid_PointerEntered"
-      PointerExited="Grid_PointerExited"
-      PointerPressed="ActiviteCard_Click">
-                            <Border Background="#FFFFFF" CornerRadius="15" Padding="10" Margin="10" BorderBrush="#DDDDDD" BorderThickness="1">
-                                <Image Source="{x:Bind Image}" Stretch="UniformToFill" />
-                            </Border>
-
-                            <Border Background="#80000000"
-            CornerRadius="15"
-            Visibility="Collapsed"
-            x:Name="HoverOverlay">
-                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
-                                    <TextBlock Text="{x:Bind Nom}" FontSize="23" FontWeight="Bold" Foreground="White" />
-                                    <TextBlock Text="{x:Bind PrixFormate}" FontSize="24" FontWeight="Bold" Foreground="White" />
-                                    <TextBlock Text="{x:Bind Description}" FontSize="16" Foreground="White" TextWrapping="Wrap" HorizontalAlignment="Center" />
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
         </ScrollViewer>
     </Grid>
 </Page>
