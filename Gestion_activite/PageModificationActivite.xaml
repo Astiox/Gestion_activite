@@ -8,8 +8,34 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Padding="20" Background="LightGray">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-    <Grid>
+        <Image Source="Assets/ville.jpg" 
+      Grid.Row="0" 
+      Stretch="Fill" 
 
+      Grid.RowSpan="3"
+      Grid.ColumnSpan="3"/>
+        <TextBlock Grid.Column="1" Grid.ColumnSpan="3" FontWeight="ExtraBold" Padding="0,0,0,20" VerticalAlignment="Bottom" FontSize="32">Modification d'une activite</TextBlock>
+        <StackPanel Spacing="10" Grid.RowSpan="2" Grid.Row="1" Grid.Column="1">
+            <TextBox PlaceholderText="Nom de l'activité" x:Name="NomActiviteInput" />
+            <TextBox PlaceholderText="Description" x:Name="DescriptionInput" />
+            <TextBox PlaceholderText="Prix d'organisation" x:Name="PrixOrgInput" />
+            <TextBox PlaceholderText="Prix de vente" x:Name="PrixVenteInput" />
+            <TextBox PlaceholderText="image de l'activite(url)" x:Name="imageacitv" />
+            <ComboBox x:Name="catactiv" Text="categorie:"  Header="choisissez une categorie"/>
+            <Button Content="Ajouter" Background="#4CAF50" Foreground="White" />
+
+        </StackPanel>
     </Grid>
 </Page>
