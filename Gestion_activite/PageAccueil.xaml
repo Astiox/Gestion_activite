@@ -38,11 +38,11 @@
                         Spacing="10"
                         Grid.Column="1">
                 <Ellipse x:Name="ConnexionStatusCircle"
-             Width="20"
-             Height="20"
-             Fill="Red"
-             VerticalAlignment="Center"
-             Margin="0,0,10,0" />
+                         Width="20"
+                         Height="20"
+                         Fill="Red"
+                         VerticalAlignment="Center"
+                         Margin="0,0,10,0" />
                 <Button x:Name="ConnexionButton"
                         Content="Connexion"
                         Width="120"

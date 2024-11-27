@@ -8,7 +8,7 @@ namespace Gestion_activite
 {
     internal class Adherent
     {
-        public int ID { get; set; }
+        public string ID { get; set; }
         public string Nom { get; set; }
         public string Prenom { get; set; }
         public DateTime DateNaissance { get; set; }
@@ -19,7 +19,7 @@ namespace Gestion_activite
 
         public Adherent() { }
 
-        public Adherent(int id, string nom, string prenom, DateTime dateNaissance, string adresse, DateTime dateInscription, string email, string motDePasse)
+        public Adherent(string id, string nom, string prenom, DateTime dateNaissance, string adresse, DateTime dateInscription, string email, string motDePasse)
         {
             ID = id;
             Nom = nom;
