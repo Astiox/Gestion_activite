@@ -1,40 +1,69 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Gestion_activite
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class PageListeAdherents : Page
     {
-        //public ObservableCollection<Adherent> Adherents { get; set; }
+        public ObservableCollection<Adherent> Adherents { get; set; } = new ObservableCollection<Adherent>();
 
         public PageListeAdherents()
         {
             this.InitializeComponent();
-      
+            LoadAdherents();
+        }
 
-        }
-        private void Logo_Click(object sender, PointerRoutedEventArgs e)
+        private void LoadAdherents()
         {
-            Frame.Navigate(typeof(PageType));
+            Adherents.Clear();
+            var adherentsBDD = SingletonBDD.GetInstance().ObtenirAdherents();
+            foreach (var adherent in adherentsBDD)
+            {
+                Adherents.Add(new Adherent
+                {
+                    ID = adherent["ID"].ToString(),
+                    Nom = adherent["Nom"].ToString(),
+                    Prenom = adherent["Prenom"].ToString()
+                });
+            }
         }
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            if (e.Parameter is bool shouldReload && shouldReload)
+            {
+                LoadAdherents(); 
+            }
+        }
+        private void SupprimerAdherent_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is Adherent adherent)
+            {
+                SingletonBDD.GetInstance().SupprimerAdherent(adherent.ID);
+                Adherents.Remove(adherent);
+            }
+        }
+
+
+        private void ModifierAdherent_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is Adherent adherent)
+            {
+                Frame.Navigate(typeof(PageModificationAdherent), adherent);
+            }
+        }
+        private void RetourButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageType)); 
+        }
+
+        private void Logo_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageType)); 
+        }
+
     }
 }

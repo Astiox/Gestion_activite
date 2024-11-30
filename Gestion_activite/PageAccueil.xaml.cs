@@ -39,6 +39,7 @@ namespace Gestion_activite
         {
             try
             {
+                SingletonBDD.TypeActiviteID = typeActiviteID; 
                 var activitesBDD = SingletonBDD.GetInstance().GetActivitesParType(typeActiviteID);
                 if (activitesBDD != null && activitesBDD.Count > 0)
                 {
@@ -185,6 +186,14 @@ namespace Gestion_activite
                 TitleTextBlock.Text = $"Liste des activités - {typeActivite.Nom}";
                 ChargerActivitesDepuisBDD(typeActivite.ID);
             }
+            else if (e.Parameter is bool shouldReload && shouldReload)
+            {
+                var utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
+                if (utilisateurConnecte != null && utilisateurConnecte.ContainsKey("TypeActiviteID"))
+                {
+                    ChargerActivitesDepuisBDD((int)utilisateurConnecte["TypeActiviteID"]);
+                }
+            }
             else
             {
                 TitleTextBlock.Text = "Liste des activités";
@@ -192,6 +201,7 @@ namespace Gestion_activite
 
             UpdateButtonStates();
         }
+
         private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             if (sender is Grid grid)

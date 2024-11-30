@@ -35,10 +35,7 @@ namespace Gestion_activite
             ChargerStatistiques();
             this.DataContext = this;
         }
-        private void Logo_Click(object sender, PointerRoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(PageType));
-        }
+     
         private void ChargerStatistiques()
         {
             var singleton = SingletonBDD.GetInstance();

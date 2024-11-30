@@ -17,6 +17,7 @@ namespace Gestion_activite
     {
         private MySqlConnection connection;
         private static SingletonBDD instance;
+        public static int? TypeActiviteID { get; set; }
 
         private SingletonBDD()
         {
@@ -41,18 +42,40 @@ namespace Gestion_activite
         }
 
 
+
         public void ExecuteNonQuery(string query, Dictionary<string, object> parameters)
         {
-            using (var command = new MySqlCommand(query, GetConnection()))
+            try
             {
-                if (parameters != null)
+                using (var command = new MySqlCommand(query, GetConnection()))
                 {
-                    foreach (var param in parameters)
-                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    Console.WriteLine($"Query: {query}");
+                    if (parameters != null)
+                    {
+                        foreach (var param in parameters)
+                        {
+                            Console.WriteLine($"Parameter: {param.Key} = {param.Value}");
+                            command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                        }
+                    }
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Query executed successfully.");
                 }
-                command.ExecuteNonQuery();
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"MySqlException: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                throw; 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                throw; 
             }
         }
+
 
         public static Dictionary<string, object> UtilisateurConnecte { get; set; }
 
@@ -290,24 +313,32 @@ namespace Gestion_activite
 
 
 
-        public void ModifierAdherent(int id, string nom, string prenom, DateTime dateNaissance, string adresse)
+        public void SupprimerAdherent(string id)
         {
-            string query = "UPDATE adherents SET Nom = @nom, Prenom = @prenom, DateNaissance = @dateNaissance, Adresse = @adresse WHERE ID = @id";
+            string query = "DELETE FROM adherents WHERE ID = @id";
+            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+        }
+
+
+        public void ModifierAdherent(string id, string nom, string prenom, DateTime dateNaissance, string adresse, DateTime dateInscription)
+        {
+            string query = "UPDATE adherents SET Nom = @nom, Prenom = @prenom, DateNaissance = @dateNaissance, Adresse = @adresse, DateInscription = @dateInscription WHERE ID = @id";
             ExecuteNonQuery(query, new Dictionary<string, object>
             {
                 { "@id", id },
                 { "@nom", nom },
                 { "@prenom", prenom },
                 { "@dateNaissance", dateNaissance },
-                { "@adresse", adresse }
+                { "@adresse", adresse },
+                { "@dateInscription", dateInscription }
             });
         }
 
-        public void SupprimerAdherent(int id)
-        {
-            string query = "DELETE FROM adherents WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
-        }
+
+
+
+
+
 
         public List<Dictionary<string, object>> ObtenirAdherents()
         {
@@ -320,18 +351,20 @@ namespace Gestion_activite
                 {
                     adherents.Add(new Dictionary<string, object>
                     {
-                        { "ID", reader.GetInt32("ID") },
-                        { "Nom", reader["Nom"].ToString() },
-                        { "Prenom", reader["Prenom"].ToString() },
-                        { "DateNaissance", reader["DateNaissance"] },
-                        { "Adresse", reader["Adresse"].ToString() },
-                        { "Email", reader["Email"].ToString() }
+                        { "ID", reader.IsDBNull(reader.GetOrdinal("ID")) ? null : reader["ID"].ToString() },
+                        { "Nom", reader.IsDBNull(reader.GetOrdinal("Nom")) ? string.Empty : reader["Nom"].ToString() },
+                        { "Prenom", reader.IsDBNull(reader.GetOrdinal("Prenom")) ? string.Empty : reader["Prenom"].ToString() },
+                        { "DateNaissance", reader.IsDBNull(reader.GetOrdinal("DateNaissance")) ? null : reader.GetDateTime(reader.GetOrdinal("DateNaissance")) },
+                        { "Adresse", reader.IsDBNull(reader.GetOrdinal("Adresse")) ? string.Empty : reader["Adresse"].ToString() },
+                        { "Email", reader.IsDBNull(reader.GetOrdinal("Email")) ? string.Empty : reader["Email"].ToString() }
                     });
                 }
             }
 
             return adherents;
         }
+
+
         public List<Activite> GetActivitesParType(int typeActiviteID)
         {
             var activites = new List<Activite>();
@@ -545,16 +578,56 @@ namespace Gestion_activite
             }
             return participations;
         }
+        public object ExecuteScalar(string query, Dictionary<string, object> parameters)
+        {
+            try
+            {
+                using (var command = new MySqlCommand(query, GetConnection()))
+                {
+                    if (parameters != null)
+                    {
+                        foreach (var param in parameters)
+                        {
+                            command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                        }
+                    }
+
+                    return command.ExecuteScalar();
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"MySqlException: {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                throw;
+            }
+        }
+
+        public bool ParticipationExiste(string adherentID, int activiteID)
+        {
+            string query = "SELECT COUNT(*) FROM participations WHERE AdherentID = @adherentID AND ActiviteID = @activiteID";
+            var result = ExecuteScalar(query, new Dictionary<string, object>
+            {
+                { "@adherentID", adherentID },
+                { "@activiteID", activiteID }
+            });
+            return Convert.ToInt32(result) > 0;
+        }
+
 
         public void AjouterParticipation(string adherentID, int seanceID, decimal? note)
         {
             string query = "INSERT INTO participations (AdherentID, SeanceID, Note, DateParticipation) VALUES (@adherentID, @seanceID, @note, NOW())";
             ExecuteNonQuery(query, new Dictionary<string, object>
-    {
-        { "@adherentID", adherentID },
-        { "@seanceID", seanceID },
-        { "@note", (object)note ?? DBNull.Value }
-    });
+            {
+                { "@adherentID", adherentID },
+                { "@seanceID", seanceID },
+                { "@note", (object)note ?? DBNull.Value }
+            });
         }
 
 
@@ -713,12 +786,11 @@ namespace Gestion_activite
 
         public Dictionary<string, int> GetAdherentsParActivite()
         {
-            string query = @"
-        SELECT activites.Nom AS ActiviteNom, COUNT(participations.ID) AS NombreAdherents
-        FROM participations
-        INNER JOIN seances ON participations.SeanceID = seances.ID
-        INNER JOIN activites ON seances.ActiviteID = activites.ID
-        GROUP BY activites.Nom";
+            string query = @"SELECT activites.Nom AS ActiviteNom, COUNT(participations.ID) AS NombreAdherents
+                            FROM participations
+                            INNER JOIN seances ON participations.SeanceID = seances.ID
+                            INNER JOIN activites ON seances.ActiviteID = activites.ID
+                            GROUP BY activites.Nom";
 
             var result = new Dictionary<string, int>();
             using (var reader = ExecuteReader(query))

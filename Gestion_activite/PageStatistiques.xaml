@@ -7,16 +7,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="#2E3A4F">
 
     <Grid Padding="20">
         
-        <Image Source="Assets/odyssea_logo.png"
-        Width="80"
-        Height="80"
-        VerticalAlignment="Center"
-        PointerPressed="Logo_Click"
-        Grid.Column="0" />
+   
         <StackPanel Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Top">
             <TextBlock Text="Statistiques"
                        FontSize="48"

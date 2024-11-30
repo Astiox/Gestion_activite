@@ -12,28 +12,26 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Image Source="Assets/odyssea_logo.png"
-        Width="80"
-        Height="80"
-        VerticalAlignment="Center"
-        PointerPressed="Logo_Click"
-        Grid.Column="0" />
-        <Button Content="Retour"
-            Width="100"
-            Height="40"
-            Background="#2196F3"
-            Foreground="White"
-            BorderBrush="Transparent"
-            CornerRadius="15"
-            Click="RetourButton_Click"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Center"
-            Margin="0,0,0,10" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="20">
+            <Button Content="Retour"
+                    Width="100"
+                    Height="40"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    BorderBrush="Transparent"
+                    CornerRadius="15"
+                    Click="RetourButton_Click" />
+            <Image Source="Assets/odyssea_logo.png"
+                   Width="80"
+                   Height="80"
+                   VerticalAlignment="Center"
+                   PointerPressed="Logo_Click" />
+        </StackPanel>
 
         <ScrollViewer Grid.Row="1">
             <StackPanel Spacing="20" HorizontalAlignment="Center" Width="600">
-
-                <Border Background="#FFFFFF" CornerRadius="15" Padding="20" >
+                <Border Background="#FFFFFF" CornerRadius="15" Padding="20">
                     <StackPanel Spacing="10">
                         <Image Source="{Binding SelectedActivite.Image}" Height="200" Margin="0,0,0,10" />
                         <TextBlock Text="{Binding SelectedActivite.Nom}" FontSize="32" FontWeight="Bold" Foreground="#333333" />
@@ -46,22 +44,20 @@
                             <TextBlock Text="Note moyenne : " FontSize="18" Foreground="#FFC107" />
                             <TextBlock Text="{Binding SelectedActivite.MoyenneNotes}" FontSize="18" Foreground="#FFC107" />
                             <TextBlock Text="/5" FontSize="18" Foreground="#FFC107" />
-
                         </StackPanel>
-
                     </StackPanel>
                 </Border>
 
                 <StackPanel>
                     <TextBlock Text="Sélectionnez une date disponible :" FontSize="18" FontWeight="SemiBold" Foreground="White" Margin="0,10,0,5" />
                     <ComboBox x:Name="DatesDisponiblesComboBox"
-                          SelectionChanged="DatesDisponiblesComboBox_SelectionChanged"
-                          ItemsSource="{Binding DatesDisponibles}"
-                          PlaceholderText="Choisissez une date"
-                          Foreground="Black"
-                          Background="White"
-                          Width="300"
-                          HorizontalAlignment="Center" />
+                              SelectionChanged="DatesDisponiblesComboBox_SelectionChanged"
+                              ItemsSource="{Binding DatesDisponibles}"
+                              PlaceholderText="Choisissez une date"
+                              Foreground="Black"
+                              Background="White"
+                              Width="300"
+                              HorizontalAlignment="Center" />
                 </StackPanel>
 
                 <StackPanel>
@@ -70,22 +66,19 @@
                               Foreground="Black" Background="White" Width="300" HorizontalAlignment="Center" />
                 </StackPanel>
 
-
                 <Button Content="Confirmer la participation"
-                    Width="250"
-                    Height="50"
-                    Background="#4CAF50"
-                    Foreground="White"
-                    BorderBrush="Transparent"
-                    CornerRadius="15"
-                    Click="ConfirmerButton_Click"
-                    HorizontalAlignment="Center"
-                    FontSize="16"
-                    FontWeight="Bold"
-                    Margin="0,20,0,0" />
-
+                        Width="250"
+                        Height="50"
+                        Background="#4CAF50"
+                        Foreground="White"
+                        BorderBrush="Transparent"
+                        CornerRadius="15"
+                        Click="ConfirmerButton_Click"
+                        HorizontalAlignment="Center"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Margin="0,20,0,0" />
             </StackPanel>
         </ScrollViewer>
     </Grid>
-
 </Page>

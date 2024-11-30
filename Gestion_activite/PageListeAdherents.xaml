@@ -7,28 +7,71 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="#2E3A4F">
 
-    <Grid>
-        <Image Source="Assets/odyssea_logo.png"
-        Width="80"
-        Height="80"
-        VerticalAlignment="Center"
-        PointerPressed="Logo_Click"
-        Grid.Column="0" />
-        <StackPanel>
-            <Button Content="Ajouter Adhérent"
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Spacing="20">
+            <Button Content="Retour"
                     Background="#4CAF50"
-                    Foreground="White" />
+                    Foreground="White"
+                    Width="120"
+                    Click="RetourButton_Click" />
 
-            <ListView >
+            <Image Source="Assets/odyssea_logo.png"
+                   Width="50"
+                   Height="50"
+                   PointerPressed="Logo_Click"
+                   VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Spacing="20">
+            <TextBlock Text="Liste des Adhérents"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center" />
+
+            <ListView ItemsSource="{x:Bind Adherents}" x:Name="AdherentsListView">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="local:Adherent">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="{x:Bind Nom}" />
-                            <TextBlock Text="{x:Bind Prenom}" />
-                            <Button Content="Modifier" />
-                            <Button Content="Supprimer" />
+                        <StackPanel Background="#FFFFFF"
+                                    CornerRadius="10"
+                                    Padding="15"
+                                    Margin="5"
+                                    Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="{x:Bind Prenom}"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"
+                                           Foreground="Black" />
+                                <TextBlock Text="{x:Bind Nom}"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"
+                                           Foreground="Black" />
+                                <TextBlock Text="{x:Bind ID}"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"
+                                           Foreground="Gray" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                <Button Content="Modifier"
+                                        Background="#2196F3"
+                                        Foreground="White"
+                                        Width="100"
+                                        Click="ModifierAdherent_Click"
+                                        DataContext="{Binding}" />
+                                <Button Content="Supprimer"
+                                        Background="#FF5722"
+                                        Foreground="White"
+                                        Width="100"
+                                        Click="SupprimerAdherent_Click"
+                                        DataContext="{Binding}" />
+                            </StackPanel>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>

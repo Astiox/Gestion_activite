@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gestion_activite
 {
-    internal class Adherent
+    public class Adherent
     {
         public string ID { get; set; }
         public string Nom { get; set; }

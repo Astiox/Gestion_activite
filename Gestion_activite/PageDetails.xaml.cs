@@ -44,6 +44,7 @@ namespace Gestion_activite
             public string Horaire { get; set; }
             public bool IsSelected { get; set; }
         }
+
         private void Logo_Click(object sender, PointerRoutedEventArgs e)
         {
             Frame.Navigate(typeof(PageType));
@@ -101,8 +102,13 @@ namespace Gestion_activite
 
         private void RetourButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(PageAccueil),true);
+            if (SelectedActivite != null)
+            {
+                Frame.Navigate(typeof(PageAccueil), SelectedActivite.TypeActiviteID);
+            }
         }
+
+
 
         private async void ConfirmerButton_Click(object sender, RoutedEventArgs e)
         {
@@ -151,6 +157,17 @@ namespace Gestion_activite
                     };
 
                     var result = await dialog.ShowAsync();
+                    if (SingletonBDD.GetInstance().ParticipationExiste(adherentID, SelectedActivite.ID))
+                    {
+                        await new ContentDialog
+                        {
+                            Title = "Erreur",
+                            Content = "Vous avez déjà réservé cette activité.",
+                            CloseButtonText = "OK",
+                            XamlRoot = this.XamlRoot
+                        }.ShowAsync();
+                        return;
+                    }
 
                     if (result == ContentDialogResult.Primary)
                     {

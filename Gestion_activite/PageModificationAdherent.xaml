@@ -7,9 +7,48 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+   Background="#2E3A4F">
 
-    <Grid>
+    <Grid Padding="20">
+        <Border Background="#80000000"
+                CornerRadius="15"
+                Padding="30">
+            <StackPanel Spacing="20" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Modifier Adhérent"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           HorizontalAlignment="Center" />
 
+                <TextBox x:Name="NomInput" PlaceholderText="Nom" Width="300" />
+                <TextBox x:Name="PrenomInput" PlaceholderText="Prénom" Width="300" />
+                <TextBox x:Name="AdresseInput" PlaceholderText="Adresse" Width="300" />
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="Date de Naissance:"
+                               FontSize="16"
+                               Foreground="White"
+                               VerticalAlignment="Center" />
+                    <DatePicker x:Name="DateNaissanceInput" Width="200" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="Date d'Inscription:"
+                               FontSize="16"
+                               Foreground="White"
+                               VerticalAlignment="Center" />
+                    <DatePicker x:Name="DateInscriptionInput" Width="200" />
+                </StackPanel>
+
+                <Button Content="Valider"
+                        Background="#4CAF50"
+                        Foreground="White"
+                        Width="200"
+                        Click="ValiderButton_Click" />
+                <Button Content="Retour"
+                        Background="#FF5722"
+                        Foreground="White"
+                        Width="200"
+                        Click="RetourButton_Click" />
+            </StackPanel>
+        </Border>
     </Grid>
 </Page>

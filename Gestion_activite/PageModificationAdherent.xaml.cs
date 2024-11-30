@@ -18,14 +18,51 @@ using Windows.Foundation.Collections;
 
 namespace Gestion_activite
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class PageModificationAdherent : Page
     {
+        private Adherent AdherentAModifier;
+
         public PageModificationAdherent()
         {
             this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            if (e.Parameter is Adherent adherent)
+            {
+                AdherentAModifier = adherent;
+                NomInput.Text = adherent.Nom;
+                PrenomInput.Text = adherent.Prenom;
+                AdresseInput.Text = adherent.Adresse;
+                DateNaissanceInput.Date = adherent.DateNaissance;
+                DateInscriptionInput.Date = adherent.DateInscription;
+            }
+        }
+
+        private void ValiderButton_Click(object sender, RoutedEventArgs e)
+        {
+            AdherentAModifier.Nom = NomInput.Text;
+            AdherentAModifier.Prenom = PrenomInput.Text;
+            AdherentAModifier.Adresse = AdresseInput.Text;
+            AdherentAModifier.DateNaissance = DateNaissanceInput.Date.DateTime;
+            AdherentAModifier.DateInscription = DateInscriptionInput.Date.DateTime;
+
+            SingletonBDD.GetInstance().ModifierAdherent(
+                AdherentAModifier.ID,
+                AdherentAModifier.Nom,
+                AdherentAModifier.Prenom,
+                AdherentAModifier.DateNaissance,
+                AdherentAModifier.Adresse,
+                AdherentAModifier.DateInscription);
+
+            Frame.Navigate(typeof(PageListeAdherents));
+        }
+
+        private void RetourButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageListeAdherents));
         }
     }
 }
