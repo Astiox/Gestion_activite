@@ -44,7 +44,10 @@ namespace Gestion_activite
             public string Horaire { get; set; }
             public bool IsSelected { get; set; }
         }
-
+        private void Logo_Click(object sender, PointerRoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageType));
+        }
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -98,7 +101,7 @@ namespace Gestion_activite
 
         private void RetourButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(PageAccueil));
+            Frame.Navigate(typeof(PageAccueil),true);
         }
 
         private async void ConfirmerButton_Click(object sender, RoutedEventArgs e)

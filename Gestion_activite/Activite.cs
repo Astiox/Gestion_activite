@@ -19,7 +19,7 @@ namespace Gestion_activite
         {
             public int ID { get; set; }
             public string Nom { get; set; }
-            public int CategorieID { get; set; }
+            public int TypeActiviteID { get; set; }
             public string Description { get; set; }
             public decimal CoutOrganisation { get; set; }
             public decimal PrixVente { get; set; }

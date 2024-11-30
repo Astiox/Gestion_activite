@@ -234,9 +234,10 @@ namespace Gestion_activite
         }
 
 
-        public void AjouterAdherent(string id, string nom, string prenom, DateTime dateNaissance, string adresse, string motDePasse, string email)
+        public void AjouterAdherent(string id, string nom, string prenom, DateTime dateNaissance, string adresse, string motDePasse, string email, DateTime dateInscription)
         {
-            string query = "INSERT INTO adherents (Nom, Prenom, DateNaissance, Adresse, MotDePasse, Email) VALUES (@nom, @prenom, @dateNaissance, @adresse, @motDePasse, @email)";
+            string query = "INSERT INTO adherents (Nom, Prenom, DateNaissance, Adresse, MotDePasse, Email, DateInscription) " +
+                           "VALUES (@nom, @prenom, @dateNaissance, @adresse, @motDePasse, @email, @dateInscription)";
             ExecuteNonQuery(query, new Dictionary<string, object>
     {
         { "@nom", nom },
@@ -244,7 +245,8 @@ namespace Gestion_activite
         { "@dateNaissance", dateNaissance },
         { "@adresse", adresse },
         { "@motDePasse", motDePasse },
-        { "@email", email }
+        { "@email", email },
+        { "@dateInscription", dateInscription }
     });
         }
 
@@ -330,32 +332,38 @@ namespace Gestion_activite
 
             return adherents;
         }
-        public ObservableCollection<Activite> GetActivites()
+        public List<Activite> GetActivitesParType(int typeActiviteID)
         {
-            var activites = new ObservableCollection<Activite>();
-            string query = "SELECT * FROM activites";
+            var activites = new List<Activite>();
+            string query = "SELECT * FROM activites WHERE TypeActiviteID = @TypeActiviteID";
 
-            using (var reader = ExecuteReader(query))
+            using (var command = new MySqlCommand(query, GetConnection()))
             {
-                while (reader.Read())
+                command.Parameters.AddWithValue("@TypeActiviteID", typeActiviteID);
+
+                using (var reader = command.ExecuteReader())
                 {
-                    activites.Add(new Activite
+                    while (reader.Read())
                     {
-                        ID = reader.GetInt32("ID"),
-                        Nom = reader.GetString("Nom"),
-                        CategorieID = reader.GetInt32("CategorieID"),
-                        Description = reader.GetString("Description"),
-                        CoutOrganisation = reader.GetDecimal("CoutOrganisation"),
-                        PrixVente = reader.GetDecimal("PrixVente"),
-                        MoyenneNotes = reader.IsDBNull(reader.GetOrdinal("MoyenneNotes")) ? 0 : reader.GetDecimal("MoyenneNotes"),
-                        NombreParticipants = reader.GetInt32("NombreParticipants"),
-                        Image = reader.IsDBNull(reader.GetOrdinal("ImageUrl")) ? "Assets/default.jpg" : reader.GetString("ImageUrl")
-                    });
+                        activites.Add(new Activite
+                        {
+                            ID = reader.GetInt32("ID"),
+                            Nom = reader.GetString("Nom"),
+                            Description = reader.GetString("Description"),
+                            CoutOrganisation = reader.GetDecimal("CoutOrganisation"),
+                            PrixVente = reader.GetDecimal("PrixVente"),
+                            MoyenneNotes = reader.IsDBNull(reader.GetOrdinal("MoyenneNotes")) ? 0 : reader.GetDecimal("MoyenneNotes"),
+                            NombreParticipants = reader.GetInt32("NombreParticipants"),
+                            Image = reader.IsDBNull(reader.GetOrdinal("ImageUrl")) ? "Assets/default.jpg" : reader.GetString("ImageUrl"),
+                            TypeActiviteID = reader.GetInt32("TypeActiviteID")
+                        });
+                    }
                 }
             }
 
             return activites;
         }
+
 
 
 
@@ -600,8 +608,159 @@ namespace Gestion_activite
             string query = "DELETE FROM categories WHERE ID = @id";
             ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
         }
+        public List<TypeActivite> GetTypesActivites()
+        {
+            var typesActivites = new List<TypeActivite>();
+            string query = "SELECT ID, Nom, Description, Image FROM typeactivite";
 
-        
+            try
+            {
+                if (connection.State == ConnectionState.Closed || connection.State == ConnectionState.Broken)
+                {
+                    connection.Open();
+                }
+
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            typesActivites.Add(new TypeActivite
+                            {
+                                ID = reader.GetInt32("ID"),
+                                Nom = reader.GetString("Nom"),
+                                Description = reader.GetString("Description"),
+                                Image = reader.GetString("Image")
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la récupération des types d'activités : {ex.Message}");
+                throw;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+
+            return typesActivites;
+        }
+
+        public void AjouterTypeActivite(TypeActivite typeActivite)
+        {
+            string query = "INSERT INTO typeactivite (Nom, Description, Image) VALUES (@Nom, @Description, @Image)";
+
+            using (var command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@Nom", typeActivite.Nom);
+                command.Parameters.AddWithValue("@Description", typeActivite.Description);
+                command.Parameters.AddWithValue("@Image", typeActivite.Image);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+
+        public void ModifierTypeActivite(TypeActivite typeActivite)
+        {
+            string query = "UPDATE typeactivite SET Nom = @Nom, Description = @Description, Image = @Image WHERE ID = @ID";
+
+            using (var command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@ID", typeActivite.ID);
+                command.Parameters.AddWithValue("@Nom", typeActivite.Nom);
+                command.Parameters.AddWithValue("@Description", typeActivite.Description);
+                command.Parameters.AddWithValue("@Image", typeActivite.Image);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+
+        public void SupprimerTypeActivite(int id)
+        {
+            string query = "DELETE FROM typeactivite WHERE ID = @ID";
+
+            using (var command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@ID", id);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+        public int GetTotalAdherents()
+        {
+            string query = "SELECT COUNT(*) FROM adherents";
+            return ExecuteScalar(query);
+        }
+
+        public int GetTotalActivites()
+        {
+            string query = "SELECT COUNT(*) FROM activites";
+            return ExecuteScalar(query);
+        }
+
+        public Dictionary<string, int> GetAdherentsParActivite()
+        {
+            string query = @"
+        SELECT activites.Nom AS ActiviteNom, COUNT(participations.ID) AS NombreAdherents
+        FROM participations
+        INNER JOIN seances ON participations.SeanceID = seances.ID
+        INNER JOIN activites ON seances.ActiviteID = activites.ID
+        GROUP BY activites.Nom";
+
+            var result = new Dictionary<string, int>();
+            using (var reader = ExecuteReader(query))
+            {
+                while (reader.Read())
+                {
+                    result[reader.GetString("ActiviteNom")] = reader.GetInt32("NombreAdherents");
+                }
+            }
+            return result;
+        }
+
+        public Dictionary<string, decimal> GetMoyenneNotesParActivite()
+        {
+            string query = @"
+        SELECT activites.Nom AS ActiviteNom, AVG(participations.Note) AS MoyenneNotes
+        FROM participations
+        INNER JOIN seances ON participations.SeanceID = seances.ID
+        INNER JOIN activites ON seances.ActiviteID = activites.ID
+        WHERE participations.Note IS NOT NULL
+        GROUP BY activites.Nom";
+
+            var result = new Dictionary<string, decimal>();
+            using (var reader = ExecuteReader(query))
+            {
+                while (reader.Read())
+                {
+                    result[reader.GetString("ActiviteNom")] = reader.IsDBNull(reader.GetOrdinal("MoyenneNotes")) ? 0 : reader.GetDecimal("MoyenneNotes");
+                }
+            }
+            return result;
+        }
+
+        private int ExecuteScalar(string query)
+        {
+            using (var command = new MySqlCommand(query, GetConnection()))
+            {
+                return Convert.ToInt32(command.ExecuteScalar());
+            }
+        }
+
+
     }
 }
  

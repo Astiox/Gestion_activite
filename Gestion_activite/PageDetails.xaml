@@ -12,7 +12,12 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
+        <Image Source="Assets/odyssea_logo.png"
+        Width="80"
+        Height="80"
+        VerticalAlignment="Center"
+        PointerPressed="Logo_Click"
+        Grid.Column="0" />
         <Button Content="Retour"
             Width="100"
             Height="40"

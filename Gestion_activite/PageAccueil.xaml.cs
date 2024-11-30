@@ -31,16 +31,15 @@ namespace Gestion_activite
         {
             this.InitializeComponent();
             Activites = new ObservableCollection<Activite>();
-            ChargerActivitesDepuisBDD();
             UpdateButtonStates();
 
         }
 
-        private void ChargerActivitesDepuisBDD()
+        private void ChargerActivitesDepuisBDD(int typeActiviteID)
         {
             try
             {
-                var activitesBDD = SingletonBDD.GetInstance().GetActivites();
+                var activitesBDD = SingletonBDD.GetInstance().GetActivitesParType(typeActiviteID);
                 if (activitesBDD != null && activitesBDD.Count > 0)
                 {
                     Activites.Clear();
@@ -56,34 +55,30 @@ namespace Gestion_activite
             }
         }
 
+
         private void UpdateButtonStates()
         {
             var utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
 
-            bool isLoggedIn = utilisateurConnecte != null;
-            bool isAdmin = isLoggedIn && utilisateurConnecte["Role"].ToString() == "Admin";
-
-            ConnexionButton.Visibility = isLoggedIn ? Visibility.Collapsed : Visibility.Visible;
-            InscriptionButton.Visibility = isLoggedIn ? Visibility.Collapsed : Visibility.Visible;
-            DeconnexionButton.Visibility = isLoggedIn ? Visibility.Visible : Visibility.Collapsed;
-
-            BoutonAjoutActivite.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
-            BoutonListeAdherents.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
-
-            ConnexionStatusCircle.Fill = isLoggedIn
-                ? new SolidColorBrush(Microsoft.UI.Colors.Green)
-                : new SolidColorBrush(Microsoft.UI.Colors.Red);
-
-            if (isLoggedIn)
+            if (utilisateurConnecte != null)
             {
-                Console.WriteLine($"Utilisateur connecté : {utilisateurConnecte["Nom"]} ({utilisateurConnecte["Role"]})");
+                ConnexionStatusTextBlock.Text = utilisateurConnecte["Role"].ToString() == "Admin"
+                    ? utilisateurConnecte["Email"].ToString()
+                    : $"Matricule: {utilisateurConnecte["ID"].ToString()}";
+                ConnexionStatusTextBlock.Visibility = Visibility.Visible;
+
+                ConnexionButton.Visibility = Visibility.Collapsed;
+                InscriptionButton.Visibility = Visibility.Collapsed;
+                DeconnexionButton.Visibility = Visibility.Visible;
             }
             else
             {
-                Console.WriteLine("Aucun utilisateur connecté.");
+                ConnexionStatusTextBlock.Visibility = Visibility.Collapsed;
+                ConnexionButton.Visibility = Visibility.Visible;
+                InscriptionButton.Visibility = Visibility.Visible;
+                DeconnexionButton.Visibility = Visibility.Collapsed;
             }
         }
-
 
 
         private async void ConnexionButton_Click(object sender, RoutedEventArgs e)
@@ -176,21 +171,27 @@ namespace Gestion_activite
         {
             Frame.Navigate(typeof(PageListeAdherents));
         }
-
-        private void ActiviteCard_Click(object sender, PointerRoutedEventArgs e)
+ 
+        private void Logo_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Grid grid && grid.DataContext is Activite activite)
-            {
-                Frame.Navigate(typeof(PageDetails), activite);
-            }
+            Frame.Navigate(typeof(PageType));
         }
-
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+
+            if (e.Parameter is TypeActivite typeActivite)
+            {
+                TitleTextBlock.Text = $"Liste des activités - {typeActivite.Nom}";
+                ChargerActivitesDepuisBDD(typeActivite.ID);
+            }
+            else
+            {
+                TitleTextBlock.Text = "Liste des activités";
+            }
+
             UpdateButtonStates();
         }
-
         private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             if (sender is Grid grid)
@@ -212,6 +213,14 @@ namespace Gestion_activite
                 {
                     overlay.Visibility = Visibility.Collapsed;
                 }
+            }
+        }
+
+        private void ActiviteCard_Click(object sender, PointerRoutedEventArgs e)
+        {
+            if (sender is Grid grid && grid.DataContext is Activite activite)
+            {
+                Frame.Navigate(typeof(PageDetails), activite);
             }
         }
     }

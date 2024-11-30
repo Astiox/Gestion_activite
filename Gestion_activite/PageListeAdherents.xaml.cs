@@ -32,5 +32,9 @@ namespace Gestion_activite
       
 
         }
+        private void Logo_Click(object sender, PointerRoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageType));
+        }
     }
 }

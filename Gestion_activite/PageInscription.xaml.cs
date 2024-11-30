@@ -18,18 +18,16 @@ using Windows.Foundation.Collections;
 
 namespace Gestion_activite
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class PageInscription : Page
     {
         public PageInscription()
         {
             this.InitializeComponent();
         }
+
         private void RetourButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(PageAccueil));
+            Frame.Navigate(typeof(PageType));
         }
 
         private async void ValiderButton_Click(object sender, RoutedEventArgs e)
@@ -49,13 +47,22 @@ namespace Gestion_activite
                 return;
             }
 
+            if (!IsValidEmail(email))
+            {
+                AfficherMessageErreur("Adresse email invalide.");
+                return;
+            }
+
             try
             {
-                SingletonBDD.GetInstance().AjouterAdherent(
-                    null, nom, prenom, dateNaissance.Value, adresse, email, motDePasse);
+                DateTime dateInscription = DateTime.Now;
+                SingletonBDD.GetInstance().AjouterAdherent(null, nom, prenom, dateNaissance.Value, adresse, motDePasse, email, dateInscription);
 
-                App.Current.Resources["IsLoggedIn"] = true;
-                App.Current.Resources["CurrentUser"] = email;
+                var utilisateur = SingletonBDD.GetInstance().AuthentifierUtilisateur(email, motDePasse);
+                if (utilisateur != null)
+                {
+                    SingletonBDD.SetUtilisateurConnecte(utilisateur);
+                }
 
                 ContentDialog successDialog = new ContentDialog
                 {
@@ -66,7 +73,7 @@ namespace Gestion_activite
                 };
                 await successDialog.ShowAsync();
 
-                Frame.Navigate(typeof(PageAccueil));
+                Frame.Navigate(typeof(PageType));
             }
             catch (Exception ex)
             {
@@ -85,9 +92,6 @@ namespace Gestion_activite
             };
             _ = errorDialog.ShowAsync();
         }
-
-
-
 
         private bool IsValidEmail(string email)
         {

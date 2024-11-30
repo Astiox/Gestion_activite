@@ -14,10 +14,10 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Image Source="Assets/backgroundAccueil.png" 
-               Grid.Row="0" 
-               Stretch="Fill" 
-               Opacity="0.3" 
+        <Image Source="Assets/backgroundAccueil.png"
+               Grid.Row="0"
+               Stretch="Fill"
+               Opacity="0.3"
                Grid.RowSpan="2" />
 
         <Grid Grid.Row="0" Padding="20">
@@ -26,23 +26,24 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Image Source="Assets/odyssea_logo.png" 
-                   Width="80" 
-                   Height="80" 
-                   VerticalAlignment="Center" 
-                   Grid.Column="0" />
+            <Image Source="Assets/odyssea_logo.png"
+                   Width="80"
+                   Height="80"
+                   VerticalAlignment="Center"
+                   Grid.Column="0"
+                   PointerPressed="Logo_Click"
+                   />
 
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Spacing="10"
                         Grid.Column="1">
-                <Ellipse x:Name="ConnexionStatusCircle"
-                         Width="20"
-                         Height="20"
-                         Fill="Red"
-                         VerticalAlignment="Center"
-                         Margin="0,0,10,0" />
+                <TextBlock x:Name="ConnexionStatusTextBlock"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           Foreground="White"
+                           Visibility="Collapsed" />
                 <Button x:Name="ConnexionButton"
                         Content="Connexion"
                         Width="120"
@@ -78,36 +79,13 @@
                         CornerRadius="15"
                         Padding="15"
                         HorizontalAlignment="Center">
-                    <TextBlock Text="Odyssea"
+                    <TextBlock x:Name="TitleTextBlock"
+                               Text="Liste des activités"
                                FontSize="48"
                                FontWeight="Bold"
                                Foreground="White"
                                HorizontalAlignment="Center" />
                 </Border>
-
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Left"
-                            Spacing="10"
-                            Margin="0,10,0,0">
-                    <Button x:Name="BoutonAjoutActivite"
-                            Content="Ajouter Activité"
-                            Width="150"
-                            Background="#4CAF50"
-                            Foreground="White"
-                            BorderBrush="Transparent"
-                            CornerRadius="15"
-                            Click="BoutonAjoutActivite_Click"
-                            Visibility="Collapsed" />
-                    <Button x:Name="BoutonListeAdherents"
-                            Content="Liste des Adhérents"
-                            Width="150"
-                            Background="#2196F3"
-                            Foreground="White"
-                            BorderBrush="Transparent"
-                            CornerRadius="15"
-                            Click="BoutonListeAdherents_Click"
-                            Visibility="Collapsed" />
-                </StackPanel>
 
                 <ItemsControl ItemsSource="{x:Bind Activites}" x:Name="ictr_activite">
                     <ItemsControl.ItemsPanel>
@@ -122,7 +100,8 @@
                                   Margin="10"
                                   PointerEntered="Grid_PointerEntered"
                                   PointerExited="Grid_PointerExited"
-                                  PointerPressed="ActiviteCard_Click">
+                                  PointerPressed="ActiviteCard_Click"
+                                  >
                                 <Border Background="#FFFFFF"
                                         CornerRadius="15"
                                         Padding="10"
@@ -135,7 +114,8 @@
                                 <Border Background="#80000000"
                                         CornerRadius="15"
                                         Visibility="Collapsed"
-                                        x:Name="HoverOverlay">
+                                        x:Name="HoverOverlay"
+                                        Padding="10">
                                     <StackPanel HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
                                                 Spacing="10">
@@ -143,7 +123,7 @@
                                                    FontSize="23"
                                                    FontWeight="Bold"
                                                    Foreground="White" />
-                                        <TextBlock Text="{x:Bind PrixFormate }"
+                                        <TextBlock Text="{x:Bind PrixFormate}"
                                                    FontSize="24"
                                                    FontWeight="Bold"
                                                    Foreground="White" />

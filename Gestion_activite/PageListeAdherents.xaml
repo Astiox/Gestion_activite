@@ -10,6 +10,12 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Image Source="Assets/odyssea_logo.png"
+        Width="80"
+        Height="80"
+        VerticalAlignment="Center"
+        PointerPressed="Logo_Click"
+        Grid.Column="0" />
         <StackPanel>
             <Button Content="Ajouter Adhérent"
                     Background="#4CAF50"
