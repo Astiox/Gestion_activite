@@ -27,8 +27,10 @@ namespace Gestion_activite
     {
         public ObservableCollection<Activite> Activites { get; set; }
 
+
         public PageAccueil()
         {
+
             this.InitializeComponent();
             Activites = new ObservableCollection<Activite>();
             UpdateButtonStates();

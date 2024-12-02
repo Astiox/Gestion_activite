@@ -87,15 +87,33 @@ namespace Gestion_activite
 
 
         public MySqlDataReader ExecuteReader(string query, Dictionary<string, object> parameters = null)
+{
+    var connection = GetConnection();
+    if (connection.State != System.Data.ConnectionState.Open)
+    {
+        connection.Open();
+    }
+
+    Console.WriteLine($"Executing query: {query}");
+    if (parameters != null)
+    {
+        foreach (var param in parameters)
         {
-            var command = new MySqlCommand(query, GetConnection());
-            if (parameters != null)
-            {
-                foreach (var param in parameters)
-                    command.Parameters.AddWithValue(param.Key, param.Value);
-            }
-            return command.ExecuteReader();
+            Console.WriteLine($"Parameter: {param.Key} = {param.Value}");
         }
+    }
+
+    var command = new MySqlCommand(query, connection);
+    if (parameters != null)
+    {
+        foreach (var param in parameters)
+            command.Parameters.AddWithValue(param.Key, param.Value);
+    }
+
+    return command.ExecuteReader();
+}
+
+
 
         public void CloseConnection()
         {
@@ -832,6 +850,51 @@ namespace Gestion_activite
             }
         }
 
+        public List<Dictionary<string, object>> ObtenirActivites()
+        {
+            string query = "SELECT ID, Nom, Description FROM activites"; 
+            var activites = new List<Dictionary<string, object>>();
+
+            using (var reader = ExecuteReader(query))
+            {
+                while (reader.Read())
+                {
+                    activites.Add(new Dictionary<string, object>
+            {
+                { "ID", reader["ID"].ToString() },
+                { "Nom", reader["Nom"].ToString() },
+                { "Description", reader["Description"].ToString() }
+            });
+                }
+            }
+
+            return activites;
+        }
+
+
+        public List<Dictionary<string, object>> Obteniradherents()
+        {
+            string query = "SELECT ID, Nom, Prenom, DateNaissance, Adresse, Email FROM adherents";
+            var adherents = new List<Dictionary<string, object>>();
+
+            using (var reader = ExecuteReader(query))
+            {
+                while (reader.Read())
+                {
+                    adherents.Add(new Dictionary<string, object>
+            {
+                { "ID", reader["ID"].ToString() },
+                { "Nom", reader["Nom"].ToString() },
+                { "Prenom", reader["Prenom"].ToString() },
+                { "DateNaissance", reader["DateNaissance"].ToString() },
+                { "Adresse", reader["Adresse"].ToString() },
+                { "Email", reader["Email"].ToString() }
+            });
+                }
+            }
+
+            return adherents;
+        }
 
     }
 }

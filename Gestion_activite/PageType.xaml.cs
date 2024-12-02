@@ -23,6 +23,8 @@ namespace Gestion_activite
     public sealed partial class PageType : Page
     {
         public ObservableCollection<TypeActivite> TypesActivites { get; set; } = new ObservableCollection<TypeActivite>();
+        public bool IsAdmin => SingletonBDD.GetUtilisateurConnecte()?["Role"].ToString() == "Admin";
+
 
         public PageType()
         {
@@ -40,14 +42,12 @@ namespace Gestion_activite
         private void LoadTypesActivites()
         {
             var types = SingletonBDD.GetInstance().GetTypesActivites();
-
             TypesActivites.Clear();
             foreach (var type in types)
             {
                 TypesActivites.Add(type);
             }
         }
-
         private void TypeCard_Click(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement element && element.DataContext is TypeActivite typeActivite)
@@ -55,7 +55,6 @@ namespace Gestion_activite
                 Frame.Navigate(typeof(PageAccueil), typeActivite);
             }
         }
-
         private void UpdateButtonStates()
         {
             var utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
@@ -70,35 +69,26 @@ namespace Gestion_activite
                 string role = utilisateurConnecte["Role"].ToString();
                 string infoTexte = role == "Admin"
                     ? $"Admin : {utilisateurConnecte["Email"]}"
-                    : $"Adhérent : {utilisateurConnecte["Nom"]}";
+                    : $"Adhérent : {utilisateurConnecte["ID"]}";
 
                 UserInfoTextBlock.Text = infoTexte;
                 UserInfoTextBlock.Visibility = Visibility.Visible;
 
-                if (role == "Admin")
-                {
-                    ListeAdherentsButton.Visibility = Visibility.Visible;
-                    StatistiquesButton.Visibility = Visibility.Visible;
-                    AjoutActiviteButton.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    ListeAdherentsButton.Visibility = Visibility.Collapsed;
-                    StatistiquesButton.Visibility = Visibility.Collapsed;
-                    AjoutActiviteButton.Visibility = Visibility.Collapsed;
-                }
+                bool isAdmin = role == "Admin";
+                ListeAdherentsButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+                StatistiquesButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+                AjoutActiviteButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+                ExporterButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
             }
             else
             {
                 UserInfoTextBlock.Visibility = Visibility.Collapsed;
-
                 ListeAdherentsButton.Visibility = Visibility.Collapsed;
                 StatistiquesButton.Visibility = Visibility.Collapsed;
                 AjoutActiviteButton.Visibility = Visibility.Collapsed;
+                ExporterButton.Visibility = Visibility.Collapsed;
             }
         }
-
-
         private async void ConnexionButton_Click(object sender, RoutedEventArgs e)
         {
             await DemanderConnexionAsync();
@@ -200,12 +190,33 @@ namespace Gestion_activite
                 }
             }
         }
-        private void SupprimerTypeButton_Click(object sender, RoutedEventArgs e)
+        private void ModifierTypeButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.DataContext is TypeActivite type)
             {
-                SingletonBDD.GetInstance().SupprimerTypeActivite(type.ID);
-                LoadTypesActivites();
+                Frame.Navigate(typeof(PageModificationTypeActivite), type);
+            }
+        }
+
+        private async void SupprimerTypeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is TypeActivite type)
+            {
+                var dialog = new ContentDialog
+                {
+                    Title = "Confirmation de suppression",
+                    Content = $"Êtes-vous sûr de vouloir supprimer le type '{type.Nom}' ?",
+                    PrimaryButtonText = "Oui",
+                    CloseButtonText = "Annuler",
+                    XamlRoot = this.XamlRoot
+                };
+
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    SingletonBDD.GetInstance().SupprimerTypeActivite(type.ID);
+                    TypesActivites.Remove(type);
+                }
             }
         }
 
@@ -223,5 +234,137 @@ namespace Gestion_activite
         {
             Frame.Navigate(typeof(PageAjoutActivite));
         }
+        private async Task ShowMessage(string message)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Information",
+                Content = message,
+                CloseButtonText = "OK",
+                XamlRoot = this.XamlRoot
+            };
+
+            await dialog.ShowAsync();
+        }
+
+        private void ExportToCsv(string fileName, List<Dictionary<string, object>> data)
+        {
+            try
+            {
+                if (data == null || data.Count == 0)
+                {
+                    _ = ShowMessage("Aucune donnée à exporter.");
+                    return;
+                }
+
+                string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
+
+                using (var writer = new StreamWriter(filePath))
+                {
+                    var headers = data.First().Keys;
+                    writer.WriteLine(string.Join(",", headers));
+
+                    foreach (var row in data)
+                    {
+                        var values = headers.Select(h => row.ContainsKey(h) ? row[h]?.ToString() : string.Empty);
+                        writer.WriteLine(string.Join(",", values));
+                    }
+                }
+
+                _ = ShowMessage($"Fichier exporté avec succès : {filePath}");
+            }
+            catch (Exception ex)
+            {
+                _ = ShowMessage($"Erreur lors de l'exportation : {ex.Message}");
+            }
+        }
+
+        private void ExportAdherents()
+        {
+            var adherents = SingletonBDD.GetInstance().ObtenirAdherents();
+            ExportToCsv("Adherents.csv", adherents);
+        }
+
+        private void ExportActivites()
+        {
+            var activites = SingletonBDD.GetInstance().ObtenirActivites();
+            ExportToCsv("Activites.csv", activites);
+        }
+
+        private void ExporterTout()
+        {
+            try
+            {
+                var adherents = SingletonBDD.GetInstance().ObtenirAdherents();
+                var activites = SingletonBDD.GetInstance().ObtenirActivites();
+
+                string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "AdherentActivite.csv");
+
+                using (var writer = new StreamWriter(filePath))
+                {
+                    if (adherents != null && adherents.Any())
+                    {
+                        writer.WriteLine("Liste des Adhérents");
+                        var headers = adherents.First().Keys;
+                        writer.WriteLine(string.Join(",", headers));
+                        foreach (var row in adherents)
+                        {
+                            var values = headers.Select(h => row[h]?.ToString() ?? string.Empty);
+                            writer.WriteLine(string.Join(",", values));
+                        }
+                    }
+
+                    if (activites != null && activites.Any())
+                    {
+                        writer.WriteLine("\nListe des Activités");
+                        var headers = activites.First().Keys;
+                        writer.WriteLine(string.Join(",", headers));
+                        foreach (var row in activites)
+                        {
+                            var values = headers.Select(h => row[h]?.ToString() ?? string.Empty);
+                            writer.WriteLine(string.Join(",", values));
+                        }
+                    }
+                }
+
+                _ = ShowMessage($"Fichier exporté avec succès : {filePath}");
+            }
+            catch (Exception ex)
+            {
+                _ = ShowMessage($"Erreur lors de l'exportation complète : {ex.Message}");
+            }
+        }
+        private async void ExporterButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Exporter les données",
+                Content = "Choisissez les données à exporter.",
+                PrimaryButtonText = "Adhérents",
+                SecondaryButtonText = "Activités",
+                CloseButtonText = "Tout exporter",
+                DefaultButton = ContentDialogButton.Primary,
+                CloseButtonCommandParameter = "Annuler",
+                XamlRoot = this.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+
+            switch (result)
+            {
+                case ContentDialogResult.Primary:
+                    ExportAdherents();
+                    break;
+                case ContentDialogResult.Secondary:
+                    ExportActivites();
+                    break;
+                case ContentDialogResult.None:
+                    ExporterTout();
+                    break;
+            }
+        }
+        
+
+        
     }
 }

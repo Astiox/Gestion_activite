@@ -117,6 +117,17 @@
                             CornerRadius="15"
                             Visibility="Collapsed"
                             Click="AjoutActiviteButton_Click" />
+                    <Button x:Name="ExporterButton"
+                            Content="Exporter"
+                            Width="120"
+                            Height="40"
+                            Background="#2196F3"
+                            Foreground="White"
+                            Visibility="Collapsed"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                        Click="ExporterButton_Click" />
+
                 </StackPanel>
 
                 <ItemsControl ItemsSource="{x:Bind TypesActivites}" x:Name="ictr_type">
@@ -173,18 +184,21 @@
                                                VerticalAlignment="Center" />
                                 </Border>
 
+                                <Button x:Name="ModifierTypeButton" Content="Modifier"
+                                            Background="#2196F3"
+                                            Foreground="White"
+                                            Visibility="Collapsed"
+                                            Width="100"
+                                            Click="ModifierTypeButton_Click"
+                                            DataContext="{Binding}" />
                                 <Button x:Name="SupprimerTypeButton"
-                                        Content="Supprimer"
-                                        Width="120"
-                                        Background="#F44336"
-                                        Foreground="White"
-                                        BorderBrush="Transparent"
-                                        CornerRadius="15"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Bottom"
-                                        Visibility="Collapsed"
-                                        Click="SupprimerTypeButton_Click"
-                                        DataContext="{Binding}" />
+                                            Content="Supprimer"
+                                            Background="#FF5722"
+                                            Foreground="White"
+                                            Visibility="Collapsed"
+                                            Width="100"
+                                            Click="SupprimerTypeButton_Click"
+                                            DataContext="{Binding}" />
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -192,4 +206,5 @@
             </StackPanel>
         </ScrollViewer>
     </Grid>
+
 </Page>
