@@ -6,7 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local1="using:Gestion_activite.Gestion_activite"
     mc:Ignorable="d"
-    Background="#2e3a4f">
+    Background="#2e3a4f"
+    x:Name="PageRoot">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -129,6 +130,23 @@
                                                    Foreground="White" />
                                     </StackPanel>
                                 </Border>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Spacing="20">
+                                    <Button Content="Modifier"
+                                            Background="#2196F3"
+                                            Foreground="White"
+                                            Width="100"
+                                            Visibility="{Binding ElementName=PageRoot, Path=IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Click="ModifierActivite_Click"
+                                            DataContext="{Binding}" />
+
+                                    <Button Content="Supprimer"
+                                            Background="#FF5722"
+                                            Foreground="White"
+                                            Width="100"
+                                            Visibility="{Binding ElementName=PageRoot, Path=IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Click="SupprimerActivite_Click"
+                                            DataContext="{Binding}" />
+                                </StackPanel>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

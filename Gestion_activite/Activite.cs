@@ -27,6 +27,8 @@ namespace Gestion_activite
             public int NombreParticipants { get; set; }
             public string Image { get; set; }
             public string PrixFormate => $"{PrixVente:F2}$";
+            public bool IsAdmin;
+
 
         }
 

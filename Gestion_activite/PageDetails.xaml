@@ -62,7 +62,8 @@
 
                 <StackPanel>
                     <TextBlock Text="Sélectionnez un horaire disponible :" FontSize="18" Foreground="White" Margin="0,10,0,5" />
-                    <ComboBox x:Name="HorairesComboBox" PlaceholderText="Choisissez un horaire" ItemsSource="{Binding HorairesDisponibles}" SelectedItem="{Binding HoraireSelectionne, Mode=TwoWay}"
+                    <ComboBox x:Name="HorairesComboBox" PlaceholderText="Choisissez un horaire" ItemsSource="{x:Bind HorairesDisponibles, Mode=OneWay}" 
+                              SelectedItem="{x:Bind HoraireSelectionne, Mode=TwoWay}" 
                               Foreground="Black" Background="White" Width="300" HorizontalAlignment="Center" />
                 </StackPanel>
 

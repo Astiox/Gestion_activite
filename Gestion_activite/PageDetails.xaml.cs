@@ -65,13 +65,23 @@ namespace Gestion_activite
             DatesDisponibles.Clear();
             var dates = SingletonBDD.GetInstance().GetAvailableDates(SelectedActivite.ID);
 
+            if (dates == null || dates.Count == 0)
+            {
+                Console.WriteLine($"Aucune date disponible pour l'activité {SelectedActivite.ID}");
+                DatesDisponiblesComboBox.ItemsSource = null;
+                return;
+            }
+
             foreach (var date in dates)
             {
                 DatesDisponibles.Add(date.ToString("dd/MM/yyyy"));
             }
 
             DatesDisponiblesComboBox.ItemsSource = DatesDisponibles;
+            Console.WriteLine($"Dates disponibles pour l'activité {SelectedActivite.ID} : {string.Join(", ", DatesDisponibles)}");
         }
+
+
 
         private void DatesDisponiblesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -85,7 +95,15 @@ namespace Gestion_activite
         private void LoadHorairesDisponibles(DateTime date)
         {
             HorairesDisponibles.Clear();
+
             var seances = SingletonBDD.GetInstance().GetSeances(SelectedActivite.ID, date);
+
+            if (seances == null || seances.Count == 0)
+            {
+                Console.WriteLine($"Aucune séance trouvée pour l'activité {SelectedActivite.ID} à la date {date:dd/MM/yyyy}");
+                HorairesComboBox.ItemsSource = null;
+                return;
+            }
 
             foreach (var seance in seances)
             {
@@ -96,17 +114,30 @@ namespace Gestion_activite
             }
 
             HorairesComboBox.ItemsSource = HorairesDisponibles;
+
+            if (HorairesDisponibles.Count == 0)
+            {
+                Console.WriteLine($"Aucun horaire disponible pour l'activité {SelectedActivite.ID} à la date {date:dd/MM/yyyy}");
+            }
+            else
+            {
+                Console.WriteLine($"Horaires disponibles pour l'activité {SelectedActivite.ID} à la date {date:dd/MM/yyyy} : {string.Join(", ", HorairesDisponibles)}");
+            }
+
             HoraireSelectionne = null; 
         }
 
 
+
+
         private void RetourButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedActivite != null)
-            {
-                Frame.Navigate(typeof(PageAccueil), SelectedActivite.TypeActiviteID);
-            }
+           
+                Frame.Navigate(typeof(PageType));
+            
         }
+
+
 
 
 
@@ -168,6 +199,17 @@ namespace Gestion_activite
                         }.ShowAsync();
                         return;
                     }
+                    if (SingletonBDD.GetInstance().ParticipationExiste(adherentID, SelectedActivite.ID))
+                    {
+                        await new ContentDialog
+                        {
+                            Title = "Erreur",
+                            Content = "Vous avez déjà réservé cette activité.",
+                            CloseButtonText = "OK",
+                            XamlRoot = this.XamlRoot
+                        }.ShowAsync();
+                        return;
+                    }
 
                     if (result == ContentDialogResult.Primary)
                     {
@@ -186,7 +228,7 @@ namespace Gestion_activite
                         XamlRoot = this.XamlRoot
                     }.ShowAsync();
 
-                    Frame.Navigate(typeof(PageAccueil));
+                    Frame.Navigate(typeof(PageType));
                 }
             }
             catch (Exception ex)
@@ -361,6 +403,7 @@ namespace Gestion_activite
                     errorMessage.Visibility = Visibility.Visible;
                     args.Cancel = true;
                 }
+
                 else
                 {
                     var utilisateur = SingletonBDD.GetInstance().AuthentifierUtilisateur(email, password);

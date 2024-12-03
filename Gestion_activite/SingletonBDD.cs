@@ -50,14 +50,18 @@ namespace Gestion_activite
                 using (var command = new MySqlCommand(query, GetConnection()))
                 {
                     Console.WriteLine($"Query: {query}");
+
                     if (parameters != null)
                     {
                         foreach (var param in parameters)
                         {
-                            Console.WriteLine($"Parameter: {param.Key} = {param.Value}");
-                            command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                            if (!command.Parameters.Contains(param.Key))
+                            {
+                                command.Parameters.AddWithValue(param.Key, param.Value);
+                            }
                         }
                     }
+
                     command.ExecuteNonQuery();
                     Console.WriteLine("Query executed successfully.");
                 }
@@ -66,15 +70,17 @@ namespace Gestion_activite
             {
                 Console.WriteLine($"MySqlException: {ex.Message}");
                 Console.WriteLine($"StackTrace: {ex.StackTrace}");
-                throw; 
+                throw;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}");
                 Console.WriteLine($"StackTrace: {ex.StackTrace}");
-                throw; 
+                throw;
             }
         }
+
+
 
 
         public static Dictionary<string, object> UtilisateurConnecte { get; set; }
@@ -420,18 +426,26 @@ namespace Gestion_activite
 
 
 
-        public void AjouterActivite(string nom, int categorieID, string description, decimal coutOrganisation, decimal prixVente)
+        public void AjouterActivite(string nom, int typeActiviteID, string description, decimal coutOrganisation, decimal prixVente, string imageUrl)
         {
-            string query = "INSERT INTO activites (Nom, CategorieID, Description, CoutOrganisation, PrixVente) VALUES (@nom, @categorieID, @description, @coutOrganisation, @prixVente)";
-            ExecuteNonQuery(query, new Dictionary<string, object>
-            {
-                { "@nom", nom },
-                { "@categorieID", categorieID },
-                { "@description", description },
-                { "@coutOrganisation", coutOrganisation },
-                { "@prixVente", prixVente }
-            });
+            string query = "INSERT INTO activites (Nom, TypeActiviteID, Description, CoutOrganisation, PrixVente, ImageUrl) " +
+                           "VALUES (@nom, @typeActiviteID, @description, @coutOrganisation, @prixVente, @imageUrl)";
+
+            var parameters = new Dictionary<string, object>
+    {
+        { "@nom", nom },
+        { "@typeActiviteID", typeActiviteID },
+        { "@description", description },
+        { "@coutOrganisation", coutOrganisation },
+        { "@prixVente", prixVente },
+        { "@imageUrl", imageUrl } 
+    };
+
+            ExecuteNonQuery(query, parameters);
         }
+
+
+
 
         public void SupprimerActivite(int id)
         {
@@ -502,48 +516,62 @@ namespace Gestion_activite
         public List<Seance> GetSeances(int activiteID, DateTime date)
         {
             var seances = new List<Seance>();
-            string query = "SELECT * FROM seances WHERE ActiviteID = @activiteID AND Date = @date";
 
-            using (var command = new MySqlCommand(query, GetConnection()))
+            try
             {
-                command.Parameters.AddWithValue("@activiteID", activiteID);
-                command.Parameters.AddWithValue("@date", date);
-
-                using (var reader = command.ExecuteReader())
+                string query = "SELECT * FROM seances WHERE ActiviteID = @ActiviteID AND Date = @Date";
+                using (var command = new MySqlCommand(query, GetConnection()))
                 {
-                    while (reader.Read())
+                    command.Parameters.AddWithValue("@ActiviteID", activiteID);
+                    command.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd")); 
+
+                    using (var reader = command.ExecuteReader())
                     {
-                        seances.Add(new Seance
+                        while (reader.Read())
                         {
-                            ID = reader.GetInt32("ID"),
-                            ActiviteID = reader.GetInt32("ActiviteID"),
-                            Date = reader.GetDateTime("Date"),
-                            Horaire = reader.GetTimeSpan("Horaire"),
-                            PlacesRestantes = reader.GetInt32("PlacesRestantes"),
-                            PlacesTotales = reader.GetInt32("PlacesTotales"),
-                        });
+                            seances.Add(new Seance
+                            {
+                                ID = reader.GetInt32("ID"),
+                                ActiviteID = reader.GetInt32("ActiviteID"),
+                                Date = reader.GetDateTime("Date"),
+                                Horaire = reader.GetTimeSpan("Horaire"),
+                                PlacesRestantes = reader.GetInt32("PlacesRestantes")
+                            });
+                        }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la récupération des séances : {ex.Message}");
+            }
+
             return seances;
         }
 
-
-
         public void ReserverPlace(int seanceID)
         {
-            string query = "UPDATE seances SET PlacesRestantes = PlacesRestantes - 1 WHERE ID = @seanceID AND PlacesRestantes > 0";
-            using (var command = new MySqlCommand(query, GetConnection()))
+            try
             {
-                command.Parameters.AddWithValue("@seanceID", seanceID);
-
-                int rowsAffected = command.ExecuteNonQuery();
-                if (rowsAffected == 0)
+                string query = "UPDATE seances SET PlacesRestantes = PlacesRestantes - 1 WHERE ID = @SeanceID";
+                using (var command = new MySqlCommand(query, connection))
                 {
-                    throw new Exception("Impossible de réserver une place. La séance est peut-être complète.");
+                    command.Parameters.AddWithValue("@SeanceID", seanceID);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la réservation de la place : {ex.Message}");
+            }
+            finally
+            {
+                connection.Close();
+            }
         }
+
 
 
         public void AjouterSeance(int activiteID, DateTime date, TimeSpan horaire, int placesTotales)
@@ -627,26 +655,59 @@ namespace Gestion_activite
 
         public bool ParticipationExiste(string adherentID, int activiteID)
         {
-            string query = "SELECT COUNT(*) FROM participations WHERE AdherentID = @adherentID AND ActiviteID = @activiteID";
-            var result = ExecuteScalar(query, new Dictionary<string, object>
+            bool existe = false;
+
+            try
             {
-                { "@adherentID", adherentID },
-                { "@activiteID", activiteID }
-            });
-            return Convert.ToInt32(result) > 0;
+                string query = "SELECT COUNT(*) FROM participations WHERE AdherentID = @AdherentID AND ActiviteID = @ActiviteID";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@AdherentID", adherentID);
+                    command.Parameters.AddWithValue("@ActiviteID", activiteID);
+
+                    connection.Open();
+                    existe = Convert.ToInt32(command.ExecuteScalar()) > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la vérification de la participation : {ex.Message}");
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return existe;
         }
 
 
-        public void AjouterParticipation(string adherentID, int seanceID, decimal? note)
+
+        public void AjouterParticipation(string adherentID, int seanceID, decimal? note = null)
         {
-            string query = "INSERT INTO participations (AdherentID, SeanceID, Note, DateParticipation) VALUES (@adherentID, @seanceID, @note, NOW())";
-            ExecuteNonQuery(query, new Dictionary<string, object>
+            try
             {
-                { "@adherentID", adherentID },
-                { "@seanceID", seanceID },
-                { "@note", (object)note ?? DBNull.Value }
-            });
+                string query = "INSERT INTO participations (AdherentID, SeanceID, Note) VALUES (@AdherentID, @SeanceID, @Note)";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@AdherentID", adherentID);
+                    command.Parameters.AddWithValue("@SeanceID", seanceID);
+                    command.Parameters.AddWithValue("@Note", note.HasValue ? (object)note.Value : DBNull.Value);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de l'ajout de la participation : {ex.Message}");
+            }
+            finally
+            {
+                connection.Close();
+            }
         }
+
 
 
 
@@ -779,9 +840,19 @@ namespace Gestion_activite
 
         public void SupprimerTypeActivite(int id)
         {
-            string query = "DELETE FROM typeactivite WHERE ID = @ID";
+            string updateQuery = "UPDATE activites SET TypeActiviteID = NULL WHERE TypeActiviteID = @ID";
+            string deleteQuery = "DELETE FROM typeactivite WHERE ID = @ID";
 
-            using (var command = new MySqlCommand(query, connection))
+            using (var command = new MySqlCommand(updateQuery, connection))
+            {
+                command.Parameters.AddWithValue("@ID", id);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+
+            using (var command = new MySqlCommand(deleteQuery, connection))
             {
                 command.Parameters.AddWithValue("@ID", id);
 
@@ -790,6 +861,9 @@ namespace Gestion_activite
                 connection.Close();
             }
         }
+
+
+
         public int GetTotalAdherents()
         {
             string query = "SELECT COUNT(*) FROM adherents";
@@ -894,6 +968,15 @@ namespace Gestion_activite
             }
 
             return adherents;
+        }
+        public bool ActiviteExiste(string nom)
+        {
+            string query = "SELECT COUNT(*) FROM activites WHERE Nom = @nom";
+            var parameters = new Dictionary<string, object>
+    {
+        { "@nom", nom }
+    };
+            return Convert.ToInt32(ExecuteScalar(query, parameters)) > 0;
         }
 
     }

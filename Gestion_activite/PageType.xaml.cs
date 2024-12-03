@@ -8,6 +8,8 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -20,12 +22,25 @@ using Windows.Foundation.Collections;
 
 namespace Gestion_activite
 {
-    public sealed partial class PageType : Page
+    public sealed partial class PageType : Page, INotifyPropertyChanged
     {
         public ObservableCollection<TypeActivite> TypesActivites { get; set; } = new ObservableCollection<TypeActivite>();
-        public bool IsAdmin => SingletonBDD.GetUtilisateurConnecte()?["Role"].ToString() == "Admin";
 
+        public event PropertyChangedEventHandler PropertyChanged;
 
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public bool IsAdmin
+        {
+            get
+            {
+                var utilisateur = SingletonBDD.GetUtilisateurConnecte();
+                return utilisateur != null && utilisateur["Role"].ToString() == "Admin";
+            }
+        }
         public PageType()
         {
             this.InitializeComponent();
@@ -55,6 +70,7 @@ namespace Gestion_activite
                 Frame.Navigate(typeof(PageAccueil), typeActivite);
             }
         }
+
         private void UpdateButtonStates()
         {
             var utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
@@ -64,34 +80,46 @@ namespace Gestion_activite
             InscriptionButton.Visibility = isLoggedIn ? Visibility.Collapsed : Visibility.Visible;
             DeconnexionButton.Visibility = isLoggedIn ? Visibility.Visible : Visibility.Collapsed;
 
+            ListeAdherentsButton.Visibility = IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            StatistiquesButton.Visibility = IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            AjoutActiviteButton.Visibility = IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            ExporterButton.Visibility = IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            AjoutAdherentButton.Visibility = IsAdmin ? Visibility.Visible: Visibility.Collapsed;
+            AjoutAdministrateurButton.Visibility = IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            AjoutCategorieButton.Visibility = IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            AjoutSeanceButton.Visibility = IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            ModificationActiviteButton.Visibility = IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            ModificationCategorieButton.Visibility = IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+            ModificationSeanceButton.Visibility = IsAdmin ? Visibility.Visible : Visibility.Collapsed;
+
+
+
             if (isLoggedIn)
             {
-                string role = utilisateurConnecte["Role"].ToString();
-                string infoTexte = role == "Admin"
+                string userInfo = IsAdmin
                     ? $"Admin : {utilisateurConnecte["Email"]}"
                     : $"Adhérent : {utilisateurConnecte["ID"]}";
 
-                UserInfoTextBlock.Text = infoTexte;
+                UserInfoTextBlock.Text = userInfo;
                 UserInfoTextBlock.Visibility = Visibility.Visible;
-
-                bool isAdmin = role == "Admin";
-                ListeAdherentsButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
-                StatistiquesButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
-                AjoutActiviteButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
-                ExporterButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
             }
             else
             {
                 UserInfoTextBlock.Visibility = Visibility.Collapsed;
-                ListeAdherentsButton.Visibility = Visibility.Collapsed;
-                StatistiquesButton.Visibility = Visibility.Collapsed;
-                AjoutActiviteButton.Visibility = Visibility.Collapsed;
-                ExporterButton.Visibility = Visibility.Collapsed;
             }
+
+            NotifyPropertyChanged(nameof(IsAdmin));
         }
+
+        private void IctrType_Loaded(object sender, RoutedEventArgs e)
+        {
+            UpdateButtonStates();
+        }
+
         private async void ConnexionButton_Click(object sender, RoutedEventArgs e)
         {
             await DemanderConnexionAsync();
+            LoadTypesActivites();
         }
 
         private void InscriptionButton_Click(object sender, RoutedEventArgs e)
@@ -103,6 +131,7 @@ namespace Gestion_activite
         {
             SingletonBDD.Deconnecter();
             UpdateButtonStates();
+            LoadTypesActivites();
         }
 
         private async Task DemanderConnexionAsync()
@@ -190,6 +219,7 @@ namespace Gestion_activite
                 }
             }
         }
+
         private void ModifierTypeButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.DataContext is TypeActivite type)
@@ -220,20 +250,7 @@ namespace Gestion_activite
             }
         }
 
-        private void ListeAdherentsButton_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(PageListeAdherents));
-        }
-
-        private void StatistiquesButton_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(PageStatistiques));
-        }
-
-        private void AjoutActiviteButton_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(PageAjoutActivite));
-        }
+        
         private async Task ShowMessage(string message)
         {
             var dialog = new ContentDialog
@@ -279,17 +296,7 @@ namespace Gestion_activite
             }
         }
 
-        private void ExportAdherents()
-        {
-            var adherents = SingletonBDD.GetInstance().ObtenirAdherents();
-            ExportToCsv("Adherents.csv", adherents);
-        }
-
-        private void ExportActivites()
-        {
-            var activites = SingletonBDD.GetInstance().ObtenirActivites();
-            ExportToCsv("Activites.csv", activites);
-        }
+        
 
         private void ExporterTout()
         {
@@ -363,8 +370,67 @@ namespace Gestion_activite
                     break;
             }
         }
-        
+        private void ListeAdherentsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageListeAdherents));
+        }
 
-        
+        private void StatistiquesButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageStatistiques));
+        }
+
+        private void AjoutActiviteButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageAjoutActivite));
+        }
+        private void ExportAdherents()
+        {
+          var adherents = SingletonBDD.GetInstance().ObtenirAdherents();
+          ExportToCsv("Adherents.csv", adherents);
+        }
+
+        private void ExportActivites()
+        {
+          var activites = SingletonBDD.GetInstance().ObtenirActivites();
+          ExportToCsv("Activites.csv", activites);
+        }
+        private void AjoutAdherentButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageAjoutAdherent));
+        }
+
+        private void AjoutSeanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageAjoutSeance));
+        }
+
+        private void AjoutCategorieButton_Click_1(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageAjoutTypeActivite));
+        }
+
+        private void AjoutAdministrateurButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageAjoutAdministrateur));
+        }
+
+        private void ModificationCategorieButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageModificationTypeActivite));
+
+        }
+
+        private void ModificationActiviteButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageModificationActivite));
+
+        }
+
+        private void ModificationSeanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageModificationTypeActivite));
+
+        }
     }
 }

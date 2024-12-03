@@ -8,35 +8,45 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
    Background="#2E3A4F">
-
-    <Grid Padding="20" Background="LightCoral">
+    <Grid Padding="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
 
-        <Image Source="https://images5.alphacoders.com/132/1327980.png" 
-          Grid.Row="0" 
-          Stretch="Fill" 
+        <Image Source="Assets/odyssea_logo.png"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Width="80"
+               Height="80"
+               PointerPressed="Logo_Click" />
 
-          Grid.RowSpan="3"
-          Grid.ColumnSpan="3"/>
-        <TextBlock Grid.Column="1" Grid.ColumnSpan="3" FontWeight="ExtraBold" Padding="0,0,0,20" VerticalAlignment="Bottom" FontSize="32">Ajout d'une activite</TextBlock>
-        <StackPanel Spacing="10" Grid.RowSpan="2" Grid.Row="1" Grid.Column="1">
-            <TextBox PlaceholderText="Nom de l'activité" x:Name="NomActiviteInput" />
-            <TextBox PlaceholderText="Description" x:Name="DescriptionInput" />
-            <TextBox PlaceholderText="Prix d'organisation" x:Name="PrixOrgInput" />
-            <TextBox PlaceholderText="Prix de vente" x:Name="PrixVenteInput" />
-            <TextBox PlaceholderText="image de l'activite(url)" x:Name="imageacitv" />
-            <ComboBox x:Name="catactiv" Text="categorie:"  Header="choisissez une categorie"/>
-            <Button Content="Ajouter" Background="#4CAF50" Foreground="White" />
-            
+        <TextBlock Text="Ajouter une Activité"
+                   FontSize="36"
+                   FontWeight="Bold"
+                   Foreground="White"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   Margin="0,20,0,20" />
+
+        <StackPanel Grid.Row="1" Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center" Width="400">
+            <TextBox x:Name="NomActiviteInput" PlaceholderText="Nom de l'activité" />
+            <TextBox x:Name="DescriptionInput" PlaceholderText="Description" />
+            <TextBox x:Name="PrixOrgInput" PlaceholderText="Prix d'organisation (€)" />
+            <TextBox x:Name="PrixVenteInput" PlaceholderText="Prix de vente (€)" />
+            <TextBox x:Name="ImageInput" PlaceholderText="URL de l'image" />
+            <ComboBox x:Name="CategorieComboBox" Header="Catégorie" />
+            <Button Content="Ajouter"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    Click="AjouterActiviteButton_Click" />
         </StackPanel>
+
+        <Button Content="Retour"
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                Margin="10"
+                Click="RetourButton_Click" />
     </Grid>
 </Page>

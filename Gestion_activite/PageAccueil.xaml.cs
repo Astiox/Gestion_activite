@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -23,9 +24,19 @@ namespace Gestion_activite
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class PageAccueil : Page
+    public sealed partial class PageAccueil : Page, INotifyPropertyChanged
     {
         public ObservableCollection<Activite> Activites { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool IsAdmin
+        {
+            get
+            {
+                var utilisateur = SingletonBDD.GetUtilisateurConnecte();
+                return utilisateur != null && utilisateur["Role"].ToString() == "Admin";
+            }
+        }
 
 
         public PageAccueil()
@@ -36,12 +47,15 @@ namespace Gestion_activite
             UpdateButtonStates();
 
         }
-
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
         private void ChargerActivitesDepuisBDD(int typeActiviteID)
         {
             try
             {
-                SingletonBDD.TypeActiviteID = typeActiviteID; 
+                SingletonBDD.TypeActiviteID = typeActiviteID;
                 var activitesBDD = SingletonBDD.GetInstance().GetActivitesParType(typeActiviteID);
                 if (activitesBDD != null && activitesBDD.Count > 0)
                 {
@@ -61,6 +75,8 @@ namespace Gestion_activite
 
         private void UpdateButtonStates()
         {
+            NotifyPropertyChanged(nameof(IsAdmin));
+
             var utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
 
             if (utilisateurConnecte != null)
@@ -82,6 +98,7 @@ namespace Gestion_activite
                 DeconnexionButton.Visibility = Visibility.Collapsed;
             }
         }
+
 
 
         private async void ConnexionButton_Click(object sender, RoutedEventArgs e)
@@ -174,7 +191,7 @@ namespace Gestion_activite
         {
             Frame.Navigate(typeof(PageListeAdherents));
         }
- 
+
         private void Logo_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(PageType));
@@ -235,6 +252,49 @@ namespace Gestion_activite
                 Frame.Navigate(typeof(PageDetails), activite);
             }
         }
+        private void ModifierActivite_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is Activite activite)
+            {
+                Frame.Navigate(typeof(PageModificationActivite), activite);
+            }
+        }
+
+        private async void SupprimerActivite_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is Activite activite)
+            {
+                var dialog = new ContentDialog
+                {
+                    Title = "Confirmation de suppression",
+                    Content = $"Êtes-vous sûr de vouloir supprimer l'activité '{activite.Nom}' ?",
+                    PrimaryButtonText = "Oui",
+                    CloseButtonText = "Annuler",
+                    XamlRoot = this.XamlRoot
+                };
+
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    try
+                    {
+                        SingletonBDD.GetInstance().SupprimerActivite(activite.ID);
+                        Activites.Remove(activite);
+                    }
+                    catch (Exception ex)
+                    {
+                        await new ContentDialog
+                        {
+                            Title = "Erreur",
+                            Content = $"Une erreur s'est produite : {ex.Message}",
+                            CloseButtonText = "OK",
+                            XamlRoot = this.XamlRoot
+                        }.ShowAsync();
+                    }
+                }
+            }
+        }
+
     }
 
 }

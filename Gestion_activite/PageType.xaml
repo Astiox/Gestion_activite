@@ -87,48 +87,161 @@
                 </Border>
 
                 <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            Spacing="20"
-                            Margin="20,0">
+            HorizontalAlignment="Center"
+            Spacing="20"
+            Margin="20,0">
                     <Button x:Name="ListeAdherentsButton"
-                            Content="Liste des Adhérents"
-                            Width="200"
-                            Background="#4CAF50"
-                            Foreground="White"
-                            BorderBrush="Transparent"
-                            CornerRadius="15"
-                            Visibility="Collapsed"
-                            Click="ListeAdherentsButton_Click" />
+            Content="Liste des Adhérents"
+            Width="220"
+            Height="50"
+            Background="#4CAF50"
+            Foreground="White"
+            BorderBrush="Transparent"
+            CornerRadius="25"
+            FontSize="16"
+            FontWeight="Bold"
+            Visibility="Collapsed"
+            Click="ListeAdherentsButton_Click">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Padding" Value="10,5"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="BorderBrush" Value="#388E3C"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                                <Setter Property="Background" Value="#4CAF50"/>
+                                
+                            </Style>
+                        </Button.Style>
+                    </Button>
                     <Button x:Name="StatistiquesButton"
                             Content="Statistiques"
-                            Width="200"
+                            Width="220"
+                            Height="50"
                             Background="#FF9800"
                             Foreground="White"
                             BorderBrush="Transparent"
-                            CornerRadius="15"
+                            CornerRadius="25"
+                            FontSize="16"
+                            FontWeight="Bold"
                             Visibility="Collapsed"
-                            Click="StatistiquesButton_Click" />
+                            Click="StatistiquesButton_Click"/>
                     <Button x:Name="AjoutActiviteButton"
-                            Content="Ajouter Activité"
-                            Width="200"
+                            Content="Ajouter une Activité"
+                            Width="220"
+                            Height="50"
                             Background="#2196F3"
                             Foreground="White"
                             BorderBrush="Transparent"
-                            CornerRadius="15"
+                            CornerRadius="25"
+                            FontSize="16"
+                            FontWeight="Bold"
                             Visibility="Collapsed"
-                            Click="AjoutActiviteButton_Click" />
-                    <Button x:Name="ExporterButton"
-                            Content="Exporter"
-                            Width="120"
-                            Height="40"
+                            Click="AjoutActiviteButton_Click"/>
+                    <Button x:Name="AjoutAdherentButton"
+                            Content="Ajouter un Adhérent"
+                            Width="220"
+                            Height="50"
                             Background="#2196F3"
                             Foreground="White"
+                            BorderBrush="Transparent"
+                            CornerRadius="25"
+                            FontSize="16"
+                            FontWeight="Bold"
                             Visibility="Collapsed"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                        Click="ExporterButton_Click" />
-
+                            Click="AjoutAdherentButton_Click"/>
+                    <Button x:Name="AjoutSeanceButton"
+                            Content="Ajouter une Séance"
+                            Width="220"
+                            Height="50"
+                            Background="#2196F3"
+                            Foreground="White"
+                            BorderBrush="Transparent"
+                            CornerRadius="25"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Visibility="Collapsed"
+                            Click="AjoutSeanceButton_Click"/>
+                    <Button x:Name="AjoutCategorieButton"
+                            Content="Ajouter une Catégorie"
+                            Width="220"
+                            Height="50"
+                            Background="#2196F3"
+                            Foreground="White"
+                            BorderBrush="Transparent"
+                            CornerRadius="25"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Visibility="Collapsed"
+                            Click="AjoutCategorieButton_Click_1"/>
                 </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Spacing="20"
+                            Margin="20,0">
+                    <Button x:Name="AjoutAdministrateurButton"
+                            Content="Ajouter un Administrateur"
+                            Width="220"
+                            Height="50"
+                            Background="#1976D2"
+                            Foreground="White"
+                            BorderBrush="Transparent"
+                            CornerRadius="25"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Visibility="Collapsed"
+                            Click="AjoutAdministrateurButton_Click"/>
+                    <Button x:Name="ExporterButton"
+                            Content="Exporter les Données"
+                            Width="220"
+                            Height="50"
+                            Background="#FF5722"
+                            Foreground="White"
+                            BorderBrush="Transparent"
+                            CornerRadius="25"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Visibility="Collapsed"
+                            Click="ExporterButton_Click"/>
+                    <Button x:Name="ModificationCategorieButton"
+                            Content="Modifier une Catégorie"
+                            Width="220"
+                            Height="50"
+                            Background="#FFC107"
+                            Foreground="White"
+                            BorderBrush="Transparent"
+                            CornerRadius="25"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Visibility="Collapsed"
+                            Click="ModificationCategorieButton_Click"/>
+                    <Button x:Name="ModificationActiviteButton"
+                            Content="Modifier une Activité"
+                            Width="220"
+                            Height="50"
+                            Background="#FFC107"
+                            Foreground="White"
+                            BorderBrush="Transparent"
+                            CornerRadius="25"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Visibility="Collapsed"
+                            Click="ModificationActiviteButton_Click"/>
+                    <Button x:Name="ModificationSeanceButton"
+                            Content="Modifier une Séance"
+                            Width="220"
+                            Height="50"
+                            Background="#FFC107"
+                            Foreground="White"
+                            BorderBrush="Transparent"
+                            CornerRadius="25"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Visibility="Collapsed"
+                            Click="ModificationSeanceButton_Click"/>
+                </StackPanel>
+
 
                 <ItemsControl ItemsSource="{x:Bind TypesActivites}" x:Name="ictr_type">
                     <ItemsControl.ItemsPanel>
@@ -138,71 +251,40 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="local:TypeActivite">
-                            <Grid Width="300"
-                                  Height="400"
-                                  Margin="10"
+                            <Grid Width="300" Height="400" Margin="10"
                                   PointerPressed="TypeCard_Click"
                                   PointerEntered="Grid_PointerEntered"
-                                  PointerExited="Grid_PointerExited">
-                                <Border Background="#FFFFFF"
-                                        CornerRadius="15"
-                                        Padding="10"
-                                        Margin="10"
-                                        BorderBrush="#DDDDDD"
-                                        BorderThickness="1">
-                                    <StackPanel Spacing="10"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center">
-                                        <Image Source="{x:Bind Image}"
-                                               Stretch="Uniform"
-                                               Height="150" />
-                                        <TextBlock Text="{x:Bind Nom}"
-                                                   FontSize="24"
-                                                   FontWeight="Bold"
-                                                   Foreground="Black"
-                                                   TextAlignment="Center" />
-                                        <TextBlock Text="{x:Bind Description}"
-                                                   FontSize="16"
-                                                   Foreground="Gray"
-                                                   TextWrapping="Wrap"
-                                                   TextAlignment="Center" />
+                                  PointerExited="Grid_PointerExited">           
+                                <Border Background="#FFFFFF" CornerRadius="15" Padding="10" Margin="10" BorderBrush="#DDDDDD" BorderThickness="1">
+                                    <StackPanel Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Image Source="{x:Bind Image}" Stretch="Uniform" Height="150" />
+                                        <TextBlock Text="{x:Bind Nom}" FontSize="24" FontWeight="Bold" Foreground="Black" TextAlignment="Center" />
+                                        <TextBlock Text="{x:Bind Description}" FontSize="16" Foreground="Gray" TextWrapping="Wrap" TextAlignment="Center" />
                                     </StackPanel>
                                 </Border>
 
-                                <Border x:Name="HoverOverlay"
-                                        Background="#80000000"
-                                        CornerRadius="15"
-                                        Visibility="Collapsed"
-                                        Padding="10"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center">
-                                    <TextBlock Text="Voir les activités"
-                                               FontSize="20"
-                                               FontWeight="Bold"
-                                               Foreground="White"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center" />
-                                </Border>
-
-                                <Button x:Name="ModifierTypeButton" Content="Modifier"
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Spacing="10">
+                                    <Button Content="Modifier"
                                             Background="#2196F3"
                                             Foreground="White"
-                                            Visibility="Collapsed"
+                                            Visibility="{x:Bind IsAdmin, Mode=OneWay}"
                                             Width="100"
                                             Click="ModifierTypeButton_Click"
                                             DataContext="{Binding}" />
-                                <Button x:Name="SupprimerTypeButton"
-                                            Content="Supprimer"
+
+                                    <Button Content="Supprimer"
                                             Background="#FF5722"
                                             Foreground="White"
-                                            Visibility="Collapsed"
+                                            Visibility="{x:Bind IsAdmin, Mode=OneWay}"
                                             Width="100"
                                             Click="SupprimerTypeButton_Click"
                                             DataContext="{Binding}" />
+                                </StackPanel>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+
             </StackPanel>
         </ScrollViewer>
     </Grid>

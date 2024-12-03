@@ -8,6 +8,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
+            <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <x:Boolean x:Key="IsLoggedIn">False</x:Boolean>
             <x:String x:Key="CurrentUser">None</x:String>
         </ResourceDictionary>
