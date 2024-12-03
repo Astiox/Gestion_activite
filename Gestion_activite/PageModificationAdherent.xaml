@@ -10,9 +10,15 @@
    Background="#2E3A4F">
 
     <Grid Padding="20">
+        <Image Source="Assets/fondsmarins.jpg"
+       Grid.Row="0"
+       Stretch="Fill"
+       Opacity="0.3"
+       Grid.RowSpan="2" />
         <Border Background="#80000000"
                 CornerRadius="15"
                 Padding="30">
+            
             <StackPanel Spacing="20" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock Text="Modifier Adhérent"
                            FontSize="32"
@@ -37,7 +43,7 @@
                                VerticalAlignment="Center" />
                     <DatePicker x:Name="DateInscriptionInput" Width="200" />
                 </StackPanel>
-
+                <StackPanel Orientation="Horizontal">
                 <Button Content="Valider"
                         Background="#4CAF50"
                         Foreground="White"
@@ -48,6 +54,7 @@
                         Foreground="White"
                         Width="200"
                         Click="RetourButton_Click" />
+                </StackPanel>
             </StackPanel>
         </Border>
     </Grid>
