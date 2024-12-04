@@ -9,7 +9,55 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+   
+        <Grid Padding="20" Background="Orange">
+            
+            
+            
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+     
+            
+        <Image Source="Assets/gym.jpg"
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            Grid.ColumnSpan="3"
+            Stretch="Fill"
+            Opacity="0.9"
+             />
 
+        <TextBlock Grid.Column="1" Grid.ColumnSpan="3" VerticalAlignment="Bottom" FontSize="32" FontWeight="ExtraBold" Foreground="DarkOrange">Modififation de Sceance</TextBlock>
+        <StackPanel Grid.Column="1" Grid.Row="1" Grid.RowSpan="2">
+            
+            <TextBox x:Name="placesRestantes" PlaceholderText="Places restantes"></TextBox>
+            <TextBox x:Name="placesTotales" PlaceholderText="Places totales"></TextBox>
+            <TextBox Grid.Column="1" x:Name="placesDispo" PlaceholderText="Places disponibles"></TextBox>
+            <DatePicker x:Name="dateSceance" Header="Nouvelle date de la sceance" FontWeight="Bold"></DatePicker>
+            <TimePicker x:Name="heureSceance" Header="Nouvelle heure de la sceance" FontWeight="Bold"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+            <Button Content="Valider"
+Background="#4CAF50"
+Foreground="White"
+Width="200"
+Click="Button_Click" />
+            <Button Content="Retour"
+Background="#FF5722"
+Foreground="White"
+Width="200"
+Click="Button_Click_1" />
+        </StackPanel>
     </Grid>
 </Page>
