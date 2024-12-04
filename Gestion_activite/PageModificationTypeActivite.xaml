@@ -22,7 +22,32 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        <Image Source="Assets/foret.jpg"
+     Grid.Row="0"
+     Grid.RowSpan="3"
+     Grid.ColumnSpan="3"
+     Stretch="Fill"
+     Opacity="0.9"
+      />
 
-        <StackPanel></StackPanel>
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" FontWeight="ExtraBold" VerticalAlignment="Bottom" HorizontalAlignment="Center">modification de la categorie de sceance</TextBlock>
+        <StackPanel Grid.Column="1" Grid.Row="1">
+            <TextBox x:Name="nomcat" PlaceholderText="Nom de la categorie"></TextBox>
+            <TextBox x:Name="desccat" PlaceholderText="Description de la categorie" Margin="0,5,0,5"/>
+            <TextBox x:Name="image" PlaceholderText="Image de la categorie"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Grid.Row="1" VerticalAlignment="Bottom" Orientation="Horizontal">
+        <Button Content="Valider"
+Background="#4CAF50"
+Foreground="White"
+Width="200"
+Click="Button_Click_1" />
+        <Button Content="Retour"
+Background="#FF5722"
+Foreground="White"
+Width="200"
+Click="Button_Click" />
+</StackPanel>
+
     </Grid>
 </Page>

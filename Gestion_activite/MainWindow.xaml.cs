@@ -26,7 +26,7 @@ namespace Gestion_activite
         public MainWindow()
         {
             this.InitializeComponent();
-            MainFrame.Navigate(typeof(PageType));
+            MainFrame.Navigate(typeof(PageModificationTypeActivite));
 
         }
 
