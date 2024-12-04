@@ -1,52 +1,53 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 using System.Collections.ObjectModel;
 
 namespace Gestion_activite
 {
     public sealed partial class PageListeAdherents : Page
     {
-        public ObservableCollection<Adherent> Adherents { get; set; } = new ObservableCollection<Adherent>();
+        public ObservableCollection<Adherent> Adherents { get; set; }
 
         public PageListeAdherents()
         {
             this.InitializeComponent();
+            Adherents = new ObservableCollection<Adherent>();
             LoadAdherents();
         }
 
+        // Charger les adhérents depuis la base de données
         private void LoadAdherents()
         {
-            Adherents.Clear();
-            var adherentsBDD = SingletonBDD.GetInstance().ObtenirAdherents();
-            foreach (var adherent in adherentsBDD)
+            try
             {
-                Adherents.Add(new Adherent
+                var adherentsBDD = SingletonBDD.GetInstance().ObtenirAdherents();
+                foreach (var adherent in adherentsBDD)
                 {
-                    ID = adherent["ID"].ToString(),
-                    Nom = adherent["Nom"].ToString(),
-                    Prenom = adherent["Prenom"].ToString()
-                });
+                    Adherents.Add(new Adherent
+                    {
+                        ID = adherent["ID"].ToString(),
+                        Nom = adherent["Nom"].ToString(),
+                        Prenom = adherent["Prenom"].ToString()
+                    });
+                }
             }
-        }
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-
-            if (e.Parameter is bool shouldReload && shouldReload)
+            catch (Exception ex)
             {
-                LoadAdherents(); 
-            }
-        }
-        private void SupprimerAdherent_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button button && button.DataContext is Adherent adherent)
-            {
-                SingletonBDD.GetInstance().SupprimerAdherent(adherent.ID);
-                Adherents.Remove(adherent);
+                ShowErrorMessage($"Erreur lors du chargement des adhérents : {ex.Message}");
             }
         }
 
+        private void RetourButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageType));
+        }
+
+        private void Logo_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageType));
+        }
 
         private void ModifierAdherent_Click(object sender, RoutedEventArgs e)
         {
@@ -55,15 +56,45 @@ namespace Gestion_activite
                 Frame.Navigate(typeof(PageModificationAdherent), adherent);
             }
         }
-        private void RetourButton_Click(object sender, RoutedEventArgs e)
+
+        private async void SupprimerAdherent_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(PageType)); 
+            if (sender is Button button && button.DataContext is Adherent adherent)
+            {
+                var dialog = new ContentDialog
+                {
+                    Title = "Confirmation de suppression",
+                    Content = $"Êtes-vous sûr de vouloir supprimer {adherent.Prenom} {adherent.Nom} ?",
+                    PrimaryButtonText = "Oui",
+                    CloseButtonText = "Annuler",
+                    XamlRoot = this.XamlRoot
+                };
+
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    try
+                    {
+                        SingletonBDD.GetInstance().SupprimerAdherent(adherent.ID.ToString());
+                        Adherents.Remove(adherent);
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowErrorMessage($"Erreur lors de la suppression : {ex.Message}");
+                    }
+                }
+            }
         }
 
-        private void Logo_Click(object sender, RoutedEventArgs e)
+        private async void ShowErrorMessage(string message)
         {
-            Frame.Navigate(typeof(PageType)); 
+            await new ContentDialog
+            {
+                Title = "Erreur",
+                Content = message,
+                CloseButtonText = "OK",
+                XamlRoot = this.XamlRoot
+            }.ShowAsync();
         }
-
     }
 }

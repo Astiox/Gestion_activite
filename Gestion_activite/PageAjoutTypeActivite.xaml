@@ -9,7 +9,52 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Spacing="20">
+            <Button Content="Retour"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    Width="120"
+                    Click="RetourButton_Click" />
+
+            <Image Source="Assets/odyssea_logo.png"
+                   Width="50"
+                   Height="50"
+                   PointerPressed="Logo_Click"
+                   VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
+            <TextBlock Text="Ajouter un Type d'Activité"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center" />
+
+            <TextBox x:Name="NomTypeInput"
+                     PlaceholderText="Nom du Type d'Activité"
+                     Width="300" />
+
+            <TextBox x:Name="DescriptionInput"
+                     PlaceholderText="Description"
+                     Width="300"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap" />
+
+            <TextBox x:Name="ImageUrlInput"
+                     PlaceholderText="URL de l'Image"
+                     Width="300" />
+
+            <Button Content="Ajouter"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    Width="200"
+                    Click="AjouterTypeActiviteButton_Click" />
+        </StackPanel>
     </Grid>
 </Page>

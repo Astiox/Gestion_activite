@@ -9,7 +9,23 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Button Content="🏠" Click="Logo_Click" Margin="0,0,10,0" Width="50" Height="50"/>
+            <Button Content="Retour" Click="RetourButton_Click" Background="#FF9800" Foreground="White" Width="100" Height="50"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <ComboBox x:Name="ActiviteComboBox" Header="Activité" Width="300" />
+            <DatePicker x:Name="DateInput" Header="Date" Width="300" />
+            <TimePicker x:Name="HoraireInput" Header="Horaire" Width="300" />
+            <TextBox x:Name="PlacesTotalesInput" Header="Nombre de places totales" Width="300" InputScope="Number" />
+            <Button Content="Ajouter Séance" Click="AjouterSeanceButton_Click" Background="#4CAF50" Foreground="White" Width="200" Height="50"/>
+        </StackPanel>
     </Grid>
 </Page>

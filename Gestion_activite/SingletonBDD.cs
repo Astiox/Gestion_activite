@@ -43,13 +43,88 @@ namespace Gestion_activite
 
 
 
-        public void ExecuteNonQuery(string query, Dictionary<string, object> parameters)
+        public void ExecuteNonQueryAdherent(string query, Dictionary<string, object> parameters)
         {
             try
             {
                 using (var command = new MySqlCommand(query, GetConnection()))
                 {
-                    Console.WriteLine($"Query: {query}");
+                    Console.WriteLine($"Executing Query for Adherent: {query}");
+
+                    AddParametersToCommand(command, parameters);
+
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Adherent query executed successfully.");
+                }
+            }
+            catch (MySqlException ex)
+            {
+                HandleException(ex, query, parameters);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex, query, parameters);
+                throw;
+            }
+        }
+        public void ExecuteNonQueryActivite(string query, Dictionary<string, object> parameters)
+        {
+            try
+            {
+                using (var command = new MySqlCommand(query, GetConnection()))
+                {
+                    Console.WriteLine($"Executing Query for Activite: {query}");
+
+                    AddParametersToCommand(command, parameters);
+
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Activite query executed successfully.");
+                }
+            }
+            catch (MySqlException ex)
+            {
+                HandleException(ex, query, parameters);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex, query, parameters);
+                throw;
+            }
+        }
+        public void ExecuteNonQueryTypeActivite(string query, Dictionary<string, object> parameters)
+        {
+            try
+            {
+                using (var command = new MySqlCommand(query, GetConnection()))
+                {
+                    Console.WriteLine($"Executing Query for TypeActivite: {query}");
+
+                    AddParametersToCommand(command, parameters);
+
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("TypeActivite query executed successfully.");
+                }
+            }
+            catch (MySqlException ex)
+            {
+                HandleException(ex, query, parameters);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex, query, parameters);
+                throw;
+            }
+        }
+        public void ExecuteNonQueryCategorie(string query, Dictionary<string, object> parameters)
+        {
+            try
+            {
+                using (var command = new MySqlCommand(query, GetConnection()))
+                {
+                    Console.WriteLine($"Categorie Query: {query}");
 
                     if (parameters != null)
                     {
@@ -57,28 +132,123 @@ namespace Gestion_activite
                         {
                             if (!command.Parameters.Contains(param.Key))
                             {
-                                command.Parameters.AddWithValue(param.Key, param.Value);
+                                command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
                             }
                         }
                     }
 
                     command.ExecuteNonQuery();
-                    Console.WriteLine("Query executed successfully.");
+                    Console.WriteLine("Categorie Query executed successfully.");
                 }
             }
             catch (MySqlException ex)
             {
-                Console.WriteLine($"MySqlException: {ex.Message}");
-                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"MySqlException (Categorie): {ex.Message}");
                 throw;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception: {ex.Message}");
-                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                Console.WriteLine($"Exception (Categorie): {ex.Message}");
                 throw;
             }
         }
+        public void ExecuteNonQuerySeance(string query, Dictionary<string, object> parameters)
+        {
+            try
+            {
+                using (var command = new MySqlCommand(query, GetConnection()))
+                {
+                    Console.WriteLine($"Seance Query: {query}");
+
+                    if (parameters != null)
+                    {
+                        foreach (var param in parameters)
+                        {
+                            if (!command.Parameters.Contains(param.Key))
+                            {
+                                command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                            }
+                        }
+                    }
+
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Seance Query executed successfully.");
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"MySqlException (Seance): {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception (Seance): {ex.Message}");
+                throw;
+            }
+        }
+        public void ExecuteNonQueryAdministrateur(string query, Dictionary<string, object> parameters)
+        {
+            try
+            {
+                using (var command = new MySqlCommand(query, GetConnection()))
+                {
+                    Console.WriteLine($"Administrateur Query: {query}");
+
+                    if (parameters != null)
+                    {
+                        foreach (var param in parameters)
+                        {
+                            if (!command.Parameters.Contains(param.Key))
+                            {
+                                command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                            }
+                        }
+                    }
+
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Administrateur Query executed successfully.");
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"MySqlException (Administrateur): {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception (Administrateur): {ex.Message}");
+                throw;
+            }
+        }
+
+        private void AddParametersToCommand(MySqlCommand command, Dictionary<string, object> parameters)
+        {
+            if (parameters != null)
+            {
+                foreach (var param in parameters)
+                {
+                    if (!command.Parameters.Contains(param.Key))
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                        Console.WriteLine($"Parameter Added: {param.Key} = {param.Value}");
+                    }
+                }
+            }
+        }
+        private void HandleException(Exception ex, string query, Dictionary<string, object> parameters)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+            Console.WriteLine($"Query: {query}");
+            if (parameters != null)
+            {
+                foreach (var param in parameters)
+                {
+                    Console.WriteLine($"Parameter: {param.Key} = {param.Value}");
+                }
+            }
+            Console.WriteLine($"StackTrace: {ex.StackTrace}");
+        }
+
 
 
 
@@ -285,7 +455,7 @@ namespace Gestion_activite
         {
             string query = "INSERT INTO adherents (Nom, Prenom, DateNaissance, Adresse, MotDePasse, Email, DateInscription) " +
                            "VALUES (@nom, @prenom, @dateNaissance, @adresse, @motDePasse, @email, @dateInscription)";
-            ExecuteNonQuery(query, new Dictionary<string, object>
+            ExecuteNonQueryAdherent(query, new Dictionary<string, object>
     {
         { "@nom", nom },
         { "@prenom", prenom },
@@ -340,14 +510,14 @@ namespace Gestion_activite
         public void SupprimerAdherent(string id)
         {
             string query = "DELETE FROM adherents WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+            ExecuteNonQueryAdherent(query, new Dictionary<string, object> { { "@id", id } });
         }
 
 
         public void ModifierAdherent(string id, string nom, string prenom, DateTime dateNaissance, string adresse, DateTime dateInscription)
         {
             string query = "UPDATE adherents SET Nom = @nom, Prenom = @prenom, DateNaissance = @dateNaissance, Adresse = @adresse, DateInscription = @dateInscription WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object>
+            ExecuteNonQueryAdherent(query, new Dictionary<string, object>
             {
                 { "@id", id },
                 { "@nom", nom },
@@ -441,7 +611,7 @@ namespace Gestion_activite
         { "@imageUrl", imageUrl } 
     };
 
-            ExecuteNonQuery(query, parameters);
+            ExecuteNonQueryActivite(query, parameters);
         }
 
 
@@ -450,14 +620,14 @@ namespace Gestion_activite
         public void SupprimerActivite(int id)
         {
             string query = "DELETE FROM activites WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+            ExecuteNonQueryActivite(query, new Dictionary<string, object> { { "@id", id } });
         }
 
 
         public void ModifierActivite(int id, string nom, int categorieID, string description, decimal coutOrganisation, decimal prixVente)
         {
             string query = "UPDATE activites SET Nom = @nom, CategorieID = @categorieID, Description = @description, CoutOrganisation = @coutOrganisation, PrixVente = @prixVente WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object>
+            ExecuteNonQueryActivite(query, new Dictionary<string, object>
             {
                 { "@id", id },
                 { "@nom", nom },
@@ -576,20 +746,21 @@ namespace Gestion_activite
 
         public void AjouterSeance(int activiteID, DateTime date, TimeSpan horaire, int placesTotales)
         {
-            string query = "INSERT INTO seances (ActiviteID, Date, Horaire, PlacesRestantes, PlacesTotales) VALUES (@activiteID, @date, @horaire, @placesTotales, @placesTotales)";
-            ExecuteNonQuery(query, new Dictionary<string, object>
+            string query = "INSERT INTO seances (ActiviteID, Date, Horaire, PlacesRestantes, PlacesTotales) VALUES (@ActiviteID, @Date, @Horaire, @PlacesTotales, @PlacesTotales)";
+            ExecuteNonQuerySeance(query, new Dictionary<string, object>
             {
-                { "@activiteID", activiteID },
-                { "@date", date },
-                { "@horaire", horaire },
-                { "@placesTotales", placesTotales }
+                    { "@ActiviteID", activiteID },
+                    { "@Date", date },
+                    { "@Horaire", horaire },
+                    { "@PlacesTotales", placesTotales }
             });
         }
+
 
         public void ModifierSeance(int id, DateTime date, TimeSpan horaire, int placesTotales)
         {
             string query = "UPDATE seances SET Date = @date, Horaire = @horaire, PlacesTotales = @placesTotales, PlacesRestantes = @placesTotales WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object>
+            ExecuteNonQuerySeance(query, new Dictionary<string, object>
             {
                 { "@id", id },
                 { "@date", date },
@@ -601,7 +772,7 @@ namespace Gestion_activite
         public void SupprimerSeance(int id)
         {
             string query = "DELETE FROM seances WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+            ExecuteNonQuerySeance(query, new Dictionary<string, object> { { "@id", id } });
         }
         public List<Participation> ObtenirParticipations(string adherentID)
         {
@@ -737,7 +908,7 @@ namespace Gestion_activite
         public void AjouterCategorie(string nom, string description)
         {
             string query = "INSERT INTO categories (Nom, Description) VALUES (@nom, @description)";
-            ExecuteNonQuery(query, new Dictionary<string, object>
+            ExecuteNonQueryCategorie(query, new Dictionary<string, object>
             {
                 { "@nom", nom },
                 { "@description", description }
@@ -747,7 +918,7 @@ namespace Gestion_activite
         public void ModifierCategorie(int id, string nom, string description)
         {
             string query = "UPDATE categories SET Nom = @nom, Description = @description WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object>
+            ExecuteNonQueryCategorie(query, new Dictionary<string, object>
             {
                 { "@id", id },
                 { "@nom", nom },
@@ -758,7 +929,7 @@ namespace Gestion_activite
         public void SupprimerCategorie(int id)
         {
             string query = "DELETE FROM categories WHERE ID = @id";
-            ExecuteNonQuery(query, new Dictionary<string, object> { { "@id", id } });
+            ExecuteNonQueryCategorie(query, new Dictionary<string, object> { { "@id", id } });
         }
         public List<TypeActivite> GetTypesActivites()
         {
@@ -973,10 +1144,30 @@ namespace Gestion_activite
         {
             string query = "SELECT COUNT(*) FROM activites WHERE Nom = @nom";
             var parameters = new Dictionary<string, object>
-    {
-        { "@nom", nom }
-    };
+            {
+                { "@nom", nom }
+            };
             return Convert.ToInt32(ExecuteScalar(query, parameters)) > 0;
+        }
+        public void AjouterAdministrateur(string nom, string prenom, string email, string motDePasse)
+        {
+            string query = "INSERT INTO administrateurs (Nom, Prenom, Email, MotDePasse) VALUES (@Nom, @Prenom, @Email, @MotDePasse)";
+            ExecuteNonQueryAdministrateur(query, new Dictionary<string, object>
+            {
+                { "@Nom", nom },
+                { "@Prenom", prenom },
+                { "@Email", email },
+                { "@MotDePasse", motDePasse }
+            });
+        }
+        public bool EmailAdminExiste(string email)
+        {
+            string query = "SELECT COUNT(*) FROM administrateurs WHERE Email = @Email";
+            int count = Convert.ToInt32(ExecuteScalar(query, new Dictionary<string, object>
+            {
+                { "@Email", email }
+            }));
+            return count > 0;
         }
 
     }

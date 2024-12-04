@@ -7,9 +7,56 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="#2E3A4F">
 
-    <Grid>
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Spacing="20">
+            <Button Content="Retour"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    Width="120"
+                    Click="RetourButton_Click" />
+
+            <Image Source="Assets/odyssea_logo.png"
+                   Width="50"
+                   Height="50"
+                   PointerPressed="Logo_Click"
+                   VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
+            <TextBlock Text="Ajouter un Administrateur"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center" />
+
+            <TextBox x:Name="NomInput"
+                     PlaceholderText="Nom"
+                     Width="300" />
+
+            <TextBox x:Name="PrenomInput"
+                     PlaceholderText="Prénom"
+                     Width="300" />
+
+            <TextBox x:Name="EmailInput"
+                     PlaceholderText="Adresse Email"
+                     Width="300" />
+
+            <PasswordBox x:Name="MotDePasseInput"
+                         PlaceholderText="Mot de Passe"
+                         Width="300" />
+
+            <Button Content="Ajouter"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    Width="200"
+                    Click="AjouterAdministrateurButton_Click" />
+        </StackPanel>
     </Grid>
 </Page>

@@ -9,7 +9,46 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
+        <Image Source="Assets/odyssea_logo.png"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Width="80"
+               Height="80"
+               PointerPressed="Logo_Click" />
+
+        <TextBlock Text="Ajouter un Adhérent"
+                   FontSize="36"
+                   FontWeight="Bold"
+                   Foreground="White"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   Margin="0,20,0,20" />
+
+        <StackPanel Grid.Row="1" Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center" Width="400">
+            <TextBox x:Name="NomInput" PlaceholderText="Nom" />
+            <TextBox x:Name="PrenomInput" PlaceholderText="Prénom" />
+            <DatePicker x:Name="DateNaissanceInput" Header="Date de Naissance" />
+            <TextBox x:Name="AdresseInput" PlaceholderText="Adresse" />
+            <TextBox x:Name="EmailInput" PlaceholderText="Email" />
+            <PasswordBox x:Name="PasswordInput" PlaceholderText="Mot de passe" />
+            <PasswordBox x:Name="ConfirmPasswordInput" PlaceholderText="Confirmer le mot de passe" />
+            <Button Content="Ajouter"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    Click="AjouterAdherentButton_Click" />
+        </StackPanel>
+
+        <Button Content="Retour"
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                Margin="10"
+                Click="RetourButton_Click" />
     </Grid>
 </Page>
