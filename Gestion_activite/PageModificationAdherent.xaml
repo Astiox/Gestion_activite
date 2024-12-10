@@ -15,9 +15,16 @@
        Stretch="Fill"
        Opacity="0.3"
        Grid.RowSpan="2" />
+        <Image Source="Assets/odyssea_logo.png"
+Width="80"
+Height="80"
+VerticalAlignment="Top"
+HorizontalAlignment="Left"
+Grid.Column="0" />
         <Border Background="#80000000"
                 CornerRadius="15"
                 Padding="30">
+            
             
             <StackPanel Spacing="20" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock Text="Modifier Adhérent"

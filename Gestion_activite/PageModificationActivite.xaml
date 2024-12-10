@@ -19,7 +19,12 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
+        <Image Source="Assets/odyssea_logo.png"
+Width="80"
+Height="80"
+VerticalAlignment="Top"
+HorizontalAlignment="Left"
+Grid.Column="0" />
         <Image Source="Assets/ville.jpg" 
       Grid.Row="0" 
       Stretch="Fill" 
@@ -35,6 +40,11 @@
             <TextBox PlaceholderText="image de l'activite(url)" x:Name="imageacitv" />
             <ComboBox x:Name="catactiv" Text="categorie:"  Header="choisissez une categorie"/>
             <Button Content="Ajouter" Background="#4CAF50" Foreground="White" />
+            <Button Content="Retour"
+Background="#FF5722"
+Foreground="White"
+Width="200"
+Click="Button_Click" />
 
         </StackPanel>
     </Grid>

@@ -29,7 +29,13 @@
      Stretch="Fill"
      Opacity="0.9"
       />
-
+        <Image Source="Assets/odyssea_logo.png"
+        Width="80"
+        Height="80"
+        VerticalAlignment="Top"
+        HorizontalAlignment="Left"
+               Opacity="1"
+        Grid.Column="0" />
         <TextBlock Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" FontWeight="ExtraBold" VerticalAlignment="Bottom" HorizontalAlignment="Center">modification de la categorie de sceance</TextBlock>
         <StackPanel Grid.Column="1" Grid.Row="1">
             <TextBox x:Name="nomcat" PlaceholderText="Nom de la categorie"></TextBox>

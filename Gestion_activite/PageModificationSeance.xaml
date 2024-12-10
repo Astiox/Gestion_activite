@@ -27,9 +27,16 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
-     
-            
+
+
+        <Image Source="Assets/odyssea_logo.png"
+Width="80"
+Height="80"
+VerticalAlignment="Top"
+HorizontalAlignment="Left"
+Grid.Column="0"
+Opacity="1"
+               />
         <Image Source="Assets/gym.jpg"
             Grid.Row="0"
             Grid.RowSpan="3"
