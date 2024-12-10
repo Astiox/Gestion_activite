@@ -121,7 +121,10 @@ namespace Gestion_activite
             }.ShowAsync();
         }
 
-
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageType));
+        }
     }
     
 

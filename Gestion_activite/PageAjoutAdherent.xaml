@@ -8,14 +8,22 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
-    <Grid Padding="20">
+    
+    
+    
+    <Grid Padding="20" Background="Gray">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
+        <Image Source="https://cbx-prod.b-cdn.net/COLOURBOX27512618.jpg"
+    Grid.Row="0"
+    Grid.RowSpan="3"
+    Grid.ColumnSpan="3"
+    Stretch="Fill"
+    Opacity="0.9"
+     />
         <Image Source="Assets/odyssea_logo.png"
                HorizontalAlignment="Left"
                VerticalAlignment="Top"
@@ -48,6 +56,7 @@
         <Button Content="Retour"
                 Grid.Row="2"
                 HorizontalAlignment="Center"
+                Background="Red"
                 Margin="10"
                 Click="RetourButton_Click" />
     </Grid>

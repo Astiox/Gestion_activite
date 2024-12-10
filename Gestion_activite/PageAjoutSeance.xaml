@@ -11,16 +11,25 @@
 
     <Grid Padding="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <Image Source="https://img.freepik.com/free-photo/person-practicing-yoga-meditation-outdoors-nature_23-2150838447.jpg"
+Grid.Row="0"
+Grid.RowSpan="3"
+Grid.ColumnSpan="3"
+Stretch="Fill"
+Opacity="0.9"
+ />
+        
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
             <Button Content="🏠" Click="Logo_Click" Margin="0,0,10,0" Width="50" Height="50"/>
             <Button Content="Retour" Click="RetourButton_Click" Background="#FF9800" Foreground="White" Width="100" Height="50"/>
         </StackPanel>
-
+        <TextBlock HorizontalAlignment="Center" FontSize="50" Foreground="Black" FontWeight="ExtraBold" VerticalAlignment="Bottom">Ajouter une sceance</TextBlock>
         <StackPanel Grid.Row="1" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+            
             <ComboBox x:Name="ActiviteComboBox" Header="Activité" Width="300" />
             <DatePicker x:Name="DateInput" Header="Date" Width="300" />
             <TimePicker x:Name="HoraireInput" Header="Horaire" Width="300" />

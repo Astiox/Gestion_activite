@@ -10,11 +10,17 @@
    Background="#2E3A4F">
     <Grid Padding="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
+        <Image Source="https://wallpapers.com/images/featured/rising-sun-1ctbcblassfqzf9q.jpg"
+Grid.Row="0"
+Grid.RowSpan="3"
+Grid.ColumnSpan="3"
+Stretch="Fill"
+Opacity="0.9"
+ />
         <Image Source="Assets/odyssea_logo.png"
                HorizontalAlignment="Left"
                VerticalAlignment="Top"
@@ -27,7 +33,7 @@
                    FontWeight="Bold"
                    Foreground="White"
                    HorizontalAlignment="Center"
-                   VerticalAlignment="Top"
+                   VerticalAlignment="Bottom"
                    Margin="0,20,0,20" />
 
         <StackPanel Grid.Row="1" Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center" Width="400">
@@ -36,17 +42,21 @@
             <TextBox x:Name="PrixOrgInput" PlaceholderText="Prix d'organisation (€)" />
             <TextBox x:Name="PrixVenteInput" PlaceholderText="Prix de vente (€)" />
             <TextBox x:Name="ImageInput" PlaceholderText="URL de l'image" />
-            <ComboBox x:Name="CategorieComboBox" Header="Catégorie" />
+           <TextBlock Foreground="White">categorie</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                 <ComboBox x:Name="CategorieComboBox" />
+                
             <Button Content="Ajouter"
                     Background="#4CAF50"
                     Foreground="White"
                     Click="AjouterActiviteButton_Click" />
+            <Button Content="retour"
+                    Background="Red"
+                    Foreground="White"
+                    Click="Button_Click" />
+            </StackPanel>
         </StackPanel>
 
-        <Button Content="Retour"
-                Grid.Row="2"
-                HorizontalAlignment="Center"
-                Margin="10"
-                Click="RetourButton_Click" />
+        
     </Grid>
 </Page>
