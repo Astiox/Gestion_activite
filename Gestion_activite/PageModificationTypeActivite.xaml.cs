@@ -35,7 +35,12 @@ namespace Gestion_activite
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            Frame.Navigate(typeof(PageType));
+        }
 
+        private void Image_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageType));
         }
     }
 }

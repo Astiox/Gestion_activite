@@ -32,6 +32,7 @@
         <Image Source="Assets/odyssea_logo.png"
         Width="80"
         Height="80"
+        PointerPressed="Image_PointerPressed"
         VerticalAlignment="Top"
         HorizontalAlignment="Left"
                Opacity="1"
