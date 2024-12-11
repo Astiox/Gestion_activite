@@ -220,6 +220,7 @@ namespace Gestion_activite
                 throw;
             }
         }
+        
 
         private void AddParametersToCommand(MySqlCommand command, Dictionary<string, object> parameters)
         {
@@ -713,6 +714,28 @@ namespace Gestion_activite
             }
             return dates;
         }
+        public List<Dictionary<string, object>> ObtenirSeances()
+        {
+            string query = "SELECT ID, Date, Horaire, PlacesRestantes, PlacesTotales FROM seances";
+            var seances = new List<Dictionary<string, object>>();
+
+            using (var reader = ExecuteReader(query))
+            {
+                while (reader.Read())
+                {
+                    seances.Add(new Dictionary<string, object>
+            {
+                { "ID", reader["ID"] },
+                { "Date", reader["Date"] },
+                { "Horaire", reader["Horaire"] },
+                { "PlacesRestantes", reader["PlacesRestantes"] },
+                { "PlacesTotales", reader["PlacesTotales"] }
+            });
+                }
+            }
+
+            return seances;
+        }
 
         public List<Seance> GetSeances(int activiteID, DateTime date)
         {
@@ -788,17 +811,48 @@ namespace Gestion_activite
         }
 
 
-        public void ModifierSeance(int id, DateTime date, TimeSpan horaire, int placesTotales)
+        public void ModifierSeance(int id, int activiteID, DateTime date, TimeSpan horaire, int placesTotales)
         {
-            string query = "UPDATE seances SET Date = @date, Horaire = @horaire, PlacesTotales = @placesTotales, PlacesRestantes = @placesTotales WHERE ID = @id";
-            ExecuteNonQuerySeance(query, new Dictionary<string, object>
+            if (id <= 0)
             {
-                { "@id", id },
-                { "@date", date },
-                { "@horaire", horaire },
-                { "@placesTotales", placesTotales }
-            });
+                throw new ArgumentException("L'ID de la séance est invalide.", nameof(id));
+            }
+            if (activiteID <= 0)
+            {
+                throw new ArgumentException("L'ID de l'activité est invalide.", nameof(activiteID));
+            }
+            if (placesTotales <= 0)
+            {
+                throw new ArgumentException("Le nombre de places totales doit être supérieur à 0.", nameof(placesTotales));
+            }
+
+            string query = "UPDATE seances SET ActiviteID = @activiteID, Date = @date, Horaire = @horaire, PlacesTotales = @placesTotales, PlacesRestantes = @placesTotales WHERE ID = @id";
+
+            try
+            {
+                ExecuteNonQuerySeance(query, new Dictionary<string, object>
+                {
+                    { "@id", id },
+                    { "@activiteID", activiteID },
+                    { "@date", date.ToString("yyyy-MM-dd") },
+                    { "@horaire", horaire.ToString(@"hh\:mm\:ss") },
+                    { "@placesTotales", placesTotales }
+                });
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"Erreur MySQL lors de la modification de la séance (ID: {id}) : {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur générale lors de la modification de la séance (ID: {id}) : {ex.Message}");
+                throw;
+            }
         }
+
+
+
 
         public void SupprimerSeance(int id)
         {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gestion_activite
 {
-    internal class Seance
+    public class Seance
     {
         public int ID { get; set; }
         public int ActiviteID { get; set; }

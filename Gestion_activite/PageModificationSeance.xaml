@@ -9,62 +9,36 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-   
-        <Grid Padding="20" Background="Orange">
-            
-            
-            
-            
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            
-            
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
 
 
-        <Image Source="Assets/odyssea_logo.png"
-Width="80"
-Height="80"
-VerticalAlignment="Top"
-HorizontalAlignment="Left"
-Grid.Column="0"
-Opacity="1"
-               />
-        <Image Source="Assets/gym.jpg"
-            Grid.Row="0"
-            Grid.RowSpan="3"
-            Grid.ColumnSpan="3"
-            Stretch="Fill"
-            Opacity="0.9"
-             />
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <TextBlock Grid.Column="1" Grid.ColumnSpan="3" VerticalAlignment="Bottom" FontSize="32" FontWeight="ExtraBold" Foreground="DarkOrange">Modififation de Sceance</TextBlock>
-        <StackPanel Grid.Column="1" Grid.Row="1" Grid.RowSpan="2">
-            
-            <TextBox x:Name="placesRestantes" PlaceholderText="Places restantes"></TextBox>
-            <TextBox x:Name="placesTotales" PlaceholderText="Places totales"></TextBox>
-            <TextBox Grid.Column="1" x:Name="placesDispo" PlaceholderText="Places disponibles"></TextBox>
-            <DatePicker x:Name="dateSceance" Header="Nouvelle date de la sceance" FontWeight="Bold"></DatePicker>
-            <TimePicker x:Name="heureSceance" Header="Nouvelle heure de la sceance" FontWeight="Bold"/>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Spacing="20">
+            <Button Content="Retour" Click="RetourButton_Click" Background="#FF5722" Foreground="White" Width="120" />
+            <Image Source="Assets/odyssea_logo.png" Width="50" Height="50" PointerPressed="RetourButton_Click" />
         </StackPanel>
-        <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
-            <Button Content="Valider"
-Background="#4CAF50"
-Foreground="White"
-Width="200"
-Click="Button_Click" />
-            <Button Content="Retour"
-Background="#FF5722"
-Foreground="White"
-Width="200"
-Click="Button_Click_1" />
-        </StackPanel>
+
+        <StackPanel Grid.Row="1" Spacing="20">
+    <ComboBox x:Name="SeanceComboBox" 
+              PlaceholderText="Choisir une séance"
+              SelectionChanged="SeanceComboBox_SelectionChanged" />
+
+    <ComboBox x:Name="ActiviteComboBox" 
+              PlaceholderText="Choisir une activité" />
+
+    <DatePicker x:Name="DateInput" Header="Date" />
+    <TimePicker x:Name="HoraireInput" Header="Horaire" />
+    <TextBox x:Name="PlacesTotalesInput" Header="Places totales" InputScope="Number" />
+
+    <Button Content="Modifier"
+            Background="#4CAF50"
+            Foreground="White"
+            Click="ModifierButton_Click" />
+</StackPanel>
+
     </Grid>
 </Page>

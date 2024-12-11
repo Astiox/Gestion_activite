@@ -158,13 +158,7 @@ namespace Gestion_activite
             {
                 if (string.IsNullOrEmpty(HoraireSelectionne))
                 {
-                    await new ContentDialog
-                    {
-                        Title = "Erreur",
-                        Content = "Veuillez sélectionner un horaire.",
-                        CloseButtonText = "OK",
-                        XamlRoot = this.XamlRoot
-                    }.ShowAsync();
+                    await ShowDialogAsync("Erreur", "Veuillez sélectionner un horaire.");
                     return;
                 }
 
@@ -176,7 +170,12 @@ namespace Gestion_activite
                 if (seanceCorrespondante != null)
                 {
                     string adherentID = utilisateurConnecte["ID"].ToString();
-                    decimal? note = null;
+
+                    if (SingletonBDD.GetInstance().ParticipationExiste(adherentID, SelectedActivite.ID))
+                    {
+                        await ShowDialogAsync("Erreur", "Vous avez déjà réservé cette activité.");
+                        return;
+                    }
 
                     var dialog = new ContentDialog
                     {
@@ -188,73 +187,65 @@ namespace Gestion_activite
                     };
 
                     var result = await dialog.ShowAsync();
-                    if (SingletonBDD.GetInstance().ParticipationExiste(adherentID, SelectedActivite.ID))
-                    {
-                        await new ContentDialog
-                        {
-                            Title = "Erreur",
-                            Content = "Vous avez déjà réservé cette activité.",
-                            CloseButtonText = "OK",
-                            XamlRoot = this.XamlRoot
-                        }.ShowAsync();
-                        return;
-                    }
-                    if (SingletonBDD.GetInstance().ParticipationExiste(adherentID, SelectedActivite.ID))
-                    {
-                        await new ContentDialog
-                        {
-                            Title = "Erreur",
-                            Content = "Vous avez déjà réservé cette activité.",
-                            CloseButtonText = "OK",
-                            XamlRoot = this.XamlRoot
-                        }.ShowAsync();
-                        return;
-                    }
+                    decimal? note = null;
 
                     if (result == ContentDialogResult.Primary)
                     {
                         note = await DemanderNoteAsync();
-                        if (note == null) return;
+                        if (note == null) return; 
                     }
 
                     SingletonBDD.GetInstance().ReserverPlace(seanceCorrespondante.ID);
                     SingletonBDD.GetInstance().AjouterParticipation(adherentID, seanceCorrespondante.ID, note);
 
-                    await new ContentDialog
-                    {
-                        Title = "Réservation réussie",
-                        Content = "Votre réservation a été enregistrée avec succès.",
-                        CloseButtonText = "OK",
-                        XamlRoot = this.XamlRoot
-                    }.ShowAsync();
-
+                    await ShowDialogAsync("Succès", "Votre réservation a été enregistrée avec succès.");
                     Frame.Navigate(typeof(PageType));
                 }
             }
             catch (Exception ex)
             {
-                await new ContentDialog
-                {
-                    Title = "Erreur",
-                    Content = ex.Message,
-                    CloseButtonText = "OK",
-                    XamlRoot = this.XamlRoot
-                }.ShowAsync();
+                await ShowDialogAsync("Erreur", ex.Message);
+            }
+        }
+        private async Task ShowDialogAsync(string title, string content)
+        {
+            if (this.XamlRoot == null)
+            {
+                Console.WriteLine("Erreur : XamlRoot est null. Le ContentDialog ne peut pas être affiché.");
+                return;
+            }
+
+            var dialog = new ContentDialog
+            {
+                Title = title,
+                Content = content,
+                CloseButtonText = "OK",
+                XamlRoot = this.XamlRoot
+            };
+
+            try
+            {
+                await dialog.ShowAsync();
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Erreur avec le ContentDialog : {ex.Message}");
             }
         }
 
 
+
         private async Task<decimal?> DemanderNoteAsync()
         {
-            StackPanel contentPanel = new StackPanel { Spacing = 10 };
+            var contentPanel = new StackPanel { Spacing = 10 };
 
-            TextBlock textBlock = new TextBlock
+            var textBlock = new TextBlock
             {
                 Text = "Veuillez noter l'activité sur 5 étoiles :",
                 FontSize = 16
             };
 
-            RatingControl ratingControl = new RatingControl
+            var ratingControl = new RatingControl
             {
                 MaxRating = 5,
                 PlaceholderValue = 0
@@ -263,7 +254,7 @@ namespace Gestion_activite
             contentPanel.Children.Add(textBlock);
             contentPanel.Children.Add(ratingControl);
 
-            ContentDialog dialog = new ContentDialog
+            var dialog = new ContentDialog
             {
                 Title = "Note de l'activité",
                 Content = contentPanel,
@@ -280,6 +271,7 @@ namespace Gestion_activite
             }
             return null;
         }
+
 
 
 
