@@ -24,12 +24,15 @@ namespace Gestion_activite
     public sealed partial class PageModificationSeance : Page
     {
         public ObservableCollection<Seance> Seances { get; set; }
+        public ObservableCollection<Activite> Activites { get; set; }
 
         public PageModificationSeance()
         {
             this.InitializeComponent();
             Seances = new ObservableCollection<Seance>();
+            Activites = new ObservableCollection<Activite>();
             LoadSeances();
+            LoadActivites();
         }
 
         private void LoadSeances()
@@ -37,13 +40,49 @@ namespace Gestion_activite
             try
             {
                 var seancesBDD = SingletonBDD.GetInstance().ObtenirSeances();
-                SeanceComboBox.ItemsSource = seancesBDD;
-                SeanceComboBox.DisplayMemberPath = "Nom";
+                Seances.Clear();
+                foreach (var seance in seancesBDD)
+                {
+                    Seances.Add(new Seance
+                    {
+                        ID = Convert.ToInt32(seance["ID"]),
+                        ActiviteID = Convert.ToInt32(seance["ActiviteID"]),
+                        Date = Convert.ToDateTime(seance["Date"]),
+                        Horaire = TimeSpan.Parse(seance["Horaire"].ToString()),
+                        PlacesTotales = Convert.ToInt32(seance["PlacesTotales"])
+                    });
+                }
+                SeanceComboBox.ItemsSource = Seances;
+                SeanceComboBox.DisplayMemberPath = "ID"; 
                 SeanceComboBox.SelectedValuePath = "ID";
             }
             catch (Exception ex)
             {
                 ShowErrorMessage($"Erreur lors du chargement des séances : {ex.Message}");
+            }
+        }
+
+        private void LoadActivites()
+        {
+            try
+            {
+                var activitesBDD = SingletonBDD.GetInstance().Obteniractivites();
+                Activites.Clear();
+                foreach (var activite in activitesBDD)
+                {
+                    Activites.Add(new Activite
+                    {
+                        ID = Convert.ToInt32(activite["ID"]),
+                        Nom = activite["Nom"].ToString()
+                    });
+                }
+                ActiviteComboBox.ItemsSource = Activites;
+                ActiviteComboBox.DisplayMemberPath = "Nom";
+                ActiviteComboBox.SelectedValuePath = "ID";
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage($"Erreur lors du chargement des activités : {ex.Message}");
             }
         }
 
@@ -74,7 +113,7 @@ namespace Gestion_activite
                 try
                 {
                     DateTime selectedDate = DateInput.SelectedDate.HasValue
-                        ? DateInput.SelectedDate.Value.DateTime
+                        ? DateInput.SelectedDate.Value.Date
                         : throw new InvalidOperationException("Veuillez sélectionner une date valide.");
 
                     SingletonBDD.GetInstance().ModifierSeance(
@@ -97,49 +136,47 @@ namespace Gestion_activite
             }
         }
 
-
-
-
-
-
-        private void RetourButton_Click(object sender, RoutedEventArgs e)
+        private async void ShowErrorMessage(string message)
         {
-            Frame.Navigate(typeof(PageType));
-        }
+            if (this.XamlRoot == null)
+            {
+                Console.WriteLine("Erreur : XamlRoot est null. Le ContentDialog ne peut pas être affiché.");
+                return;
+            }
 
-        private async Task ShowDialogAsync(string title, string content)
-        {
             var dialog = new ContentDialog
             {
-                Title = title,
-                Content = content,
-                CloseButtonText = "OK"
+                Title = "Erreur",
+                Content = message,
+                CloseButtonText = "OK",
+                XamlRoot = this.XamlRoot 
             };
-
-            if (this.XamlRoot != null)
-            {
-                dialog.XamlRoot = this.XamlRoot;
-            }
 
             try
             {
                 await dialog.ShowAsync();
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
                 Console.WriteLine($"Erreur lors de l'affichage du ContentDialog : {ex.Message}");
             }
         }
 
-        private async void ShowErrorMessage(string message)
-        {
-            await ShowDialogAsync("Erreur", message);
-        }
 
         private async void ShowSuccessMessage(string message)
         {
-            await ShowDialogAsync("Succès", message);
+            await new ContentDialog
+            {
+                Title = "Succès",
+                Content = message,
+                CloseButtonText = "OK",
+                XamlRoot = this.XamlRoot
+            }.ShowAsync();
         }
 
+        private void RetourButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(PageType));
+        }
     }
 }
