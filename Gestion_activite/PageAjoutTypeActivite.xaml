@@ -34,14 +34,14 @@ Opacity="0.9"
         </StackPanel>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="15">
-            <TextBlock Text="Ajouter un Type d'Activité"
+            <TextBlock Text="Ajouter une categorie d'Activité"
                        FontSize="32"
                        FontWeight="Bold"
                        Foreground="White"
                        HorizontalAlignment="Center" />
 
             <TextBox x:Name="NomTypeInput"
-                     PlaceholderText="Nom du Type d'Activité"
+                     PlaceholderText="Nom de la categorie d'Activité"
                      Width="300" />
 
             <TextBox x:Name="DescriptionInput"
