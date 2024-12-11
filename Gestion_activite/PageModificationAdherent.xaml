@@ -9,6 +9,8 @@
     mc:Ignorable="d"
    Background="#2E3A4F">
 
+    
+    
     <Grid Padding="20">
         <Image Source="Assets/fondsmarins.jpg"
        Grid.Row="0"

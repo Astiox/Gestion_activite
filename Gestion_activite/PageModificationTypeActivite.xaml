@@ -16,6 +16,15 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <Image Source="https://t4.ftcdn.net/jpg/05/36/32/95/360_F_536329537_RblOApJIbTIPjNlROJrKKiJaFmceLJvZ.jpg"
+Grid.Row="0"
+Grid.RowSpan="3"
+Grid.ColumnSpan="3"
+Stretch="Fill"
+Opacity="0.9"
+ />
+        
+        
         <StackPanel Orientation="Horizontal" Grid.Row="0" Spacing="20" VerticalAlignment="Top" HorizontalAlignment="Left">
             <Image Source="Assets/odyssea_logo.png" 
                    Width="50" Height="50" 
