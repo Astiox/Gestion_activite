@@ -7,18 +7,23 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="Purple">
 
-
+    
 
     <Grid Padding="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
+        <Image Source="https://img.freepik.com/free-photo/view-empty-soccer-stadium-with-fantasy-dreamy-sky_23-2151563012.jpg"
+Grid.Row="0"
+Grid.RowSpan="3"
+Grid.ColumnSpan="3"
+Stretch="Fill"
+Opacity="0.9"
+ />
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Spacing="20">
-            <Button Content="Retour" Click="RetourButton_Click" Background="#FF5722" Foreground="White" Width="120" />
             <Image Source="Assets/odyssea_logo.png" Width="50" Height="50" PointerPressed="RetourButton_Click" />
         </StackPanel>
 
