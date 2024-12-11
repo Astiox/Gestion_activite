@@ -7,13 +7,21 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="SandyBrown">
     <Grid Padding="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <Image Source="https://static.vecteezy.com/system/resources/thumbnails/028/792/487/small_2x/runner-feet-running-on-a-stadium-closeup-on-feet-sports-background-space-for-copy-ai-generative-free-photo.jpg"
+Grid.Row="0"
+Grid.RowSpan="3"
+Grid.ColumnSpan="3"
+Stretch="Fill"
+Opacity="0.9"
+ />
+        
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Spacing="10">
             <Button Content="Retour" Width="100" Height="40" Background="#FF5722" Foreground="White" Click="Button_Click" />
             <Image Source="Assets/odyssea_logo.png" Width="60" Height="60" VerticalAlignment="Center" HorizontalAlignment="Left" />
