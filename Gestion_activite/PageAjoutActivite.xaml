@@ -39,13 +39,13 @@ Opacity="0.9"
         <StackPanel Grid.Row="1" Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center" Width="400">
             <TextBox x:Name="NomActiviteInput" PlaceholderText="Nom de l'activité" />
             <TextBox x:Name="DescriptionInput" PlaceholderText="Description" />
-            <TextBox x:Name="PrixOrgInput" PlaceholderText="Prix d'organisation (€)" />
-            <TextBox x:Name="PrixVenteInput" PlaceholderText="Prix de vente (€)" />
+            <TextBox x:Name="PrixOrgInput" PlaceholderText="Prix d'organisation ($)" />
+            <TextBox x:Name="PrixVenteInput" PlaceholderText="Prix de vente ($)" />
             <TextBox x:Name="ImageInput" PlaceholderText="URL de l'image" />
            <TextBlock Foreground="White">categorie</TextBlock>
-            <StackPanel Orientation="Horizontal">
-                 <ComboBox x:Name="CategorieComboBox" />
-                
+            <ComboBox x:Name="CategorieComboBox" />
+
+            <StackPanel Orientation="Horizontal">                
             <Button Content="Ajouter"
                     Background="#4CAF50"
                     Foreground="White"

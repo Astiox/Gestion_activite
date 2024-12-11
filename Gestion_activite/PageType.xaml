@@ -264,13 +264,7 @@
                                 </Border>
 
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Spacing="10">
-                                    <Button Content="Modifier"
-                                            Background="#2196F3"
-                                            Foreground="White"
-                                            Visibility="{x:Bind IsAdmin, Mode=OneWay}"
-                                            Width="100"
-                                            Click="ModifierTypeButton_Click"
-                                            DataContext="{Binding}" />
+                                    
 
                                     <Button Content="Supprimer"
                                             Background="#FF5722"

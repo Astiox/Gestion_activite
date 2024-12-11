@@ -24,7 +24,9 @@ Opacity="0.9"
  />
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <Button Content="🏠" Click="Logo_Click" Margin="0,0,10,0" Width="50" Height="50"/>
+            <Button Click="Logo_Click" Margin="0,0,10,0" Width="100" Height="100"  Background="Transparent" BorderThickness="0">
+                <Image Source="Assets/odyssea_logo.png" Stretch="Uniform" Width="50" Height="50"/>
+            </Button>
             <Button Content="Retour" Click="RetourButton_Click" Background="#FF9800" Foreground="White" Width="100" Height="50"/>
         </StackPanel>
         <TextBlock HorizontalAlignment="Center" FontSize="50" Foreground="Black" FontWeight="ExtraBold" VerticalAlignment="Bottom">Ajouter une sceance</TextBlock>

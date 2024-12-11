@@ -8,44 +8,43 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <Grid Padding="20" Background="LightCoral">
+    <Grid Padding="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Image Source="Assets/odyssea_logo.png"
-Width="80"
-Height="80"
-VerticalAlignment="Top"
-HorizontalAlignment="Left"
-Grid.Column="0" />
-        <Image Source="Assets/ville.jpg" 
-      Grid.Row="0" 
-      Stretch="Fill" 
 
-      Grid.RowSpan="3"
-      Grid.ColumnSpan="3"/>
-        <TextBlock Grid.Column="1" Grid.ColumnSpan="3" FontWeight="ExtraBold" Padding="0,0,0,20" VerticalAlignment="Bottom" FontSize="32">Modification d'une activite</TextBlock>
-        <StackPanel Spacing="10" Grid.RowSpan="2" Grid.Row="1" Grid.Column="1">
-            <TextBox PlaceholderText="Nom de l'activité" x:Name="NomActiviteInput" />
-            <TextBox PlaceholderText="Description" x:Name="DescriptionInput" />
-            <TextBox PlaceholderText="Prix d'organisation" x:Name="PrixOrgInput" />
-            <TextBox PlaceholderText="Prix de vente" x:Name="PrixVenteInput" />
-            <TextBox PlaceholderText="image de l'activite(url)" x:Name="imageacitv" />
-            <ComboBox x:Name="catactiv" Text="categorie:"  Header="choisissez une categorie"/>
-            <Button Content="Ajouter" Background="#4CAF50" Foreground="White" />
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Spacing="20">
             <Button Content="Retour"
-Background="#FF5722"
-Foreground="White"
-Width="200"
-Click="Button_Click" />
+                    Background="#FF5722"
+                    Foreground="White"
+                    Width="120"
+                    Click="Button_Click" />
+            <Image Source="Assets/odyssea_logo.png"
+                   Width="50"
+                   Height="50"
+                   PointerPressed="Logo_Click"
+                   VerticalAlignment="Center" />
+        </StackPanel>
 
+        <StackPanel Grid.Row="1" Spacing="20" HorizontalAlignment="Center">
+            <ComboBox x:Name="ActiviteComboBox"
+                      Header="Choisir une activité"
+                      SelectionChanged="ActiviteComboBox_SelectionChanged"
+                      Width="300" />
+
+            <TextBox x:Name="NomActiviteInput" PlaceholderText="Nom de l'activité" Width="300" />
+            <TextBox x:Name="DescriptionInput" PlaceholderText="Description" Width="300" />
+            <TextBox x:Name="PrixOrgInput" PlaceholderText="Prix d'organisation" Width="300" />
+            <TextBox x:Name="PrixVenteInput" PlaceholderText="Prix de vente" Width="300" />
+            <TextBox x:Name="ImageInput" PlaceholderText="Image de l'activité (URL)" Width="300" />
+            <ComboBox x:Name="catactiv" Header="Catégorie" Width="300" />
+
+            <Button Content="Modifier"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    Click="ModifierButton_Click"
+                    Width="200" />
         </StackPanel>
     </Grid>
 </Page>

@@ -131,13 +131,7 @@
                                     </StackPanel>
                                 </Border>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Spacing="20">
-                                    <Button Content="Modifier"
-                                            Background="#2196F3"
-                                            Foreground="White"
-                                            Width="100"
-                                            Visibility="{Binding ElementName=PageRoot, Path=IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                            Click="ModifierActivite_Click"
-                                            DataContext="{Binding}" />
+                                    
 
                                     <Button Content="Supprimer"
                                             Background="#FF5722"

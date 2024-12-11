@@ -624,19 +624,22 @@ namespace Gestion_activite
         }
 
 
-        public void ModifierActivite(int id, string nom, int categorieID, string description, decimal coutOrganisation, decimal prixVente)
+        public void ModifierActivite(int id, string nom, int typeActiviteID, string description, decimal coutOrganisation, decimal prixVente, string imageUrl)
         {
-            string query = "UPDATE activites SET Nom = @nom, CategorieID = @categorieID, Description = @description, CoutOrganisation = @coutOrganisation, PrixVente = @prixVente WHERE ID = @id";
+            string query = "UPDATE activites SET Nom = @nom, TypeActiviteID = @typeActiviteID, Description = @description, CoutOrganisation = @coutOrganisation, PrixVente = @prixVente, ImageUrl = @imageUrl WHERE ID = @id";
             ExecuteNonQueryActivite(query, new Dictionary<string, object>
             {
                 { "@id", id },
                 { "@nom", nom },
-                { "@categorieID", categorieID },
+                { "@typeActiviteID", typeActiviteID },
                 { "@description", description },
                 { "@coutOrganisation", coutOrganisation },
-                { "@prixVente", prixVente }
+                { "@prixVente", prixVente },
+                { "@imageUrl", imageUrl }
             });
         }
+
+
 
 
 
@@ -664,6 +667,34 @@ namespace Gestion_activite
             }
             return liste;
         }
+        public List<Dictionary<string, object>> ObtenirActivites()
+        {
+            string query = "SELECT ID, Nom, Description FROM activites";
+            var activites = new List<Dictionary<string, object>>();
+
+            try
+            {
+                using (var reader = ExecuteReader(query))
+                {
+                    while (reader.Read())
+                    {
+                        activites.Add(new Dictionary<string, object>
+                {
+                    { "ID", reader["ID"].ToString() },
+                    { "Nom", reader["Nom"].ToString() },
+                    { "Description", reader["Description"].ToString() }
+                });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la récupération des activités : {ex.Message}");
+            }
+
+            return activites;
+        }
+
         public List<DateTime> GetAvailableDates(int activiteID)
         {
             List<DateTime> dates = new List<DateTime>();
@@ -915,16 +946,38 @@ namespace Gestion_activite
             });
         }
 
-        public void ModifierCategorie(int id, string nom, string description)
+        public void ModifierCategorie(int id, string nom, string description, string imageUrl)
         {
-            string query = "UPDATE categories SET Nom = @nom, Description = @description WHERE ID = @id";
+            if (id <= 0)
+            {
+                throw new ArgumentException("L'ID de la catégorie est invalide.");
+            }
+
+            if (string.IsNullOrWhiteSpace(nom))
+            {
+                throw new ArgumentException("Le nom de la catégorie ne peut pas être vide.");
+            }
+
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                throw new ArgumentException("La description de la catégorie ne peut pas être vide.");
+            }
+
+            if (string.IsNullOrWhiteSpace(imageUrl))
+            {
+                throw new ArgumentException("L'URL de l'image de la catégorie ne peut pas être vide.");
+            }
+
+            string query = "UPDATE typeactivite SET Nom = @nom, Description = @description, Image = @image WHERE ID = @id";
             ExecuteNonQueryCategorie(query, new Dictionary<string, object>
             {
                 { "@id", id },
                 { "@nom", nom },
-                { "@description", description }
+                { "@description", description },
+                { "@image", imageUrl }
             });
         }
+
 
         public void SupprimerCategorie(int id)
         {
@@ -1095,26 +1148,6 @@ namespace Gestion_activite
             }
         }
 
-        public List<Dictionary<string, object>> ObtenirActivites()
-        {
-            string query = "SELECT ID, Nom, Description FROM activites"; 
-            var activites = new List<Dictionary<string, object>>();
-
-            using (var reader = ExecuteReader(query))
-            {
-                while (reader.Read())
-                {
-                    activites.Add(new Dictionary<string, object>
-            {
-                { "ID", reader["ID"].ToString() },
-                { "Nom", reader["Nom"].ToString() },
-                { "Description", reader["Description"].ToString() }
-            });
-                }
-            }
-
-            return activites;
-        }
 
 
         public List<Dictionary<string, object>> Obteniradherents()
