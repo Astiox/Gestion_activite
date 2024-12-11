@@ -7,21 +7,24 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="#2E3A4F">
+    Background="SaddleBrown">
 
     <Grid Padding="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+       
+        <Image Source="https://t3.ftcdn.net/jpg/06/29/67/86/360_F_629678625_do1KZEIJ2I43KhW05ZtM7mynTlE73IOj.jpg"
+Grid.Row="0"
+Grid.RowSpan="3"
+Grid.ColumnSpan="3"
+Stretch="Fill"
+Opacity="0.9"
+ />
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Spacing="20">
-            <Button Content="Retour"
-                    Background="#4CAF50"
-                    Foreground="White"
-                    Width="120"
-                    Click="RetourButton_Click" />
-
+        
             <Image Source="Assets/odyssea_logo.png"
                    Width="50"
                    Height="50"
@@ -56,7 +59,8 @@
                     Background="#4CAF50"
                     Foreground="White"
                     Width="200"
-                    Click="AjouterAdministrateurButton_Click" />
+                    Click="AjouterAdministrateurButton_Click" 
+                    HorizontalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </Page>

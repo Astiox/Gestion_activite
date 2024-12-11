@@ -7,21 +7,25 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="Black">
 
     <Grid Padding="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Image Source="https://ww2.kqed.org/app/uploads/sites/23/2015/06/iStock_000060107916_Large-1440x953.jpg"
+Grid.Row="0"
+Grid.RowSpan="3"
+Grid.ColumnSpan="3"
+Stretch="Fill"
+Opacity="0.9"
+ />
 
+
+        
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Spacing="20">
-            <Button Content="Retour"
-                    Background="#4CAF50"
-                    Foreground="White"
-                    Width="120"
-                    Click="RetourButton_Click" />
-
+   
             <Image Source="Assets/odyssea_logo.png"
                    Width="50"
                    Height="50"
@@ -54,7 +58,8 @@
                     Background="#4CAF50"
                     Foreground="White"
                     Width="200"
-                    Click="AjouterTypeActiviteButton_Click" />
+                    Click="AjouterTypeActiviteButton_Click"
+                    HorizontalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </Page>
