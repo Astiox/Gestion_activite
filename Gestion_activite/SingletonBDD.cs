@@ -251,6 +251,26 @@ namespace Gestion_activite
         }
 
 
+        public bool ParticipationExistePourSeance(string adherentID, int seanceID)
+        {
+            string query = "SELECT COUNT(*) FROM participations WHERE AdherentID = @AdherentID AND SeanceID = @SeanceID";
+            try
+            {
+                using (var command = new MySqlCommand(query, GetConnection()))
+                {
+                    command.Parameters.AddWithValue("@AdherentID", adherentID);
+                    command.Parameters.AddWithValue("@SeanceID", seanceID);
+
+                    int count = Convert.ToInt32(command.ExecuteScalar());
+                    return count > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur lors de la vérification de la participation pour la séance : {ex.Message}");
+                throw;
+            }
+        }
 
 
 

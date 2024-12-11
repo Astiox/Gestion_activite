@@ -150,7 +150,7 @@ namespace Gestion_activite
                 utilisateurConnecte = SingletonBDD.GetUtilisateurConnecte();
                 if (utilisateurConnecte == null)
                 {
-                    return;
+                    return; 
                 }
             }
 
@@ -170,6 +170,12 @@ namespace Gestion_activite
                 if (seanceCorrespondante != null)
                 {
                     string adherentID = utilisateurConnecte["ID"].ToString();
+
+                    if (SingletonBDD.GetInstance().ParticipationExistePourSeance(adherentID, seanceCorrespondante.ID))
+                    {
+                        await ShowDialogAsync("Erreur", "Vous avez déjà réservé cette séance.");
+                        return;
+                    }
 
                     if (SingletonBDD.GetInstance().ParticipationExiste(adherentID, SelectedActivite.ID))
                     {
@@ -201,12 +207,17 @@ namespace Gestion_activite
                     await ShowDialogAsync("Succès", "Votre réservation a été enregistrée avec succès.");
                     Frame.Navigate(typeof(PageType));
                 }
+                else
+                {
+                    await ShowDialogAsync("Erreur", "Séance introuvable. Veuillez réessayer.");
+                }
             }
             catch (Exception ex)
             {
                 await ShowDialogAsync("Erreur", ex.Message);
             }
         }
+
         private async Task ShowDialogAsync(string title, string content)
         {
             if (this.XamlRoot == null)

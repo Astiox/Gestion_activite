@@ -26,7 +26,7 @@ Stretch="Fill"
 Opacity="0.9"
  />
 
-        <TextBlock FontSize="40" Foreground="White" HorizontalAlignment="Center" Grid.ColumnSpan="3" VerticalAlignment="Bottom" FontWeight="ExtraBlack">Modifier un type d'activite</TextBlock>
+        <TextBlock FontSize="40" Foreground="White" HorizontalAlignment="Center" Grid.ColumnSpan="3" VerticalAlignment="Bottom" FontWeight="ExtraBlack">Modifier une Categorie</TextBlock>
         <StackPanel Orientation="Horizontal" Grid.Row="0" Spacing="20" VerticalAlignment="Top" HorizontalAlignment="Left">
             <Image Source="Assets/odyssea_logo.png" 
                    Width="50" Height="50" 

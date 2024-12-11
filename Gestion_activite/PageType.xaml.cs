@@ -429,7 +429,7 @@ namespace Gestion_activite
 
         private void ModificationSeanceButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(PageModificationTypeActivite));
+            Frame.Navigate(typeof(PageModificationSeance));
 
         }
     }
